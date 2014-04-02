@@ -1,0 +1,147 @@
+﻿ProgArduino -> 
+	ListaProg
+
+ListaProg ->
+	ListaComandosX
+	
+ListaComandosX ->
+	Declaracao |
+	If |
+	While |
+	DoWhile |
+	For |
+	Switch |
+	Atribuicao |
+	Funcao |
+	ListaComandosX
+
+ListaComandos ->
+	DeclaraVar |
+	If |
+	While |
+	DoWhile |
+	For |
+	Switch |
+	Atribuicao |
+	Funcao |
+	ListaComandos
+
+Declaracao -> 
+	TipoVar id DecB | 
+	void id ( DecC
+DecB -> 
+	; | 
+	, id ListaVar | 
+	( DecC
+DecC -> 
+	(ListaDecParm) { ListaComandos Retorno }
+Retorno -> 
+	return Exp ; | {}
+
+ListaDecParm -> 
+	TipoVar id ListaDecParmB | 
+	{}
+ListaDecParmB -> 
+	, TipoVar id ListaDecParmB | 
+	{}
+
+ListaVar -> 
+	, id ListaVar |
+	{}
+
+DeclaraVar ->
+	TipoVar id ListaVar;
+
+TipoVar ->
+	int |
+	long |
+	float |
+	byte
+
+Atribuicao -> 
+	id = Exp
+
+Exp -> T R
+R -> || T R1
+R -> Ɛ
+
+T -> F U
+U -> && F U1
+U -> Ɛ
+
+F -> G
+
+G -> ~G
+G -> H V
+
+V -> > H V1
+V -> == H V1
+V -> < H V1
+V -> >= H V1
+V -> != H V1
+V -> <= H V1
+V -> Ɛ
+
+H -> J X
+X -> + J X1
+X -> - J X1
+X -> Ɛ
+
+J -> K Y
+Y -> * K Y1
+Y -> / K Y1
+Y -> % K Y1
+Y -> Ɛ
+
+K ->
+	int |
+	long |
+	byte |
+	float |
+	id |
+	(E) |
+	funcao()
+
+If ->
+	if ( Exp ) { ListaComandos } IfEnd
+IfEnd ->
+	else { ListaComandos } |
+	else If |
+	{}
+	
+While ->
+	while ( Exp ) { ListaComandos }
+
+DoWhile ->
+	do { ListaComandos } while ( Exp );
+
+For ->
+	for ( ListaAtrib; Exp; ListaAtrib ) { ListaComandos }
+ListaAtrib ->
+	Atribuicao ListaAtribA
+ListaAtribA ->
+	, Atribuicao ListaAtribA |
+	{}
+
+Funcao ->
+	id ( ListaParam );
+	id.id ( ListaParam  );
+ListaParam -> 
+	Exp ListaParamRec | 
+	{}
+ListaParamRec -> 
+	, Exp ListaParamRec | 
+	{}
+	
+Switch ->
+	switch ( Exp ) { ListaCase SwitchDefault }
+ListaCase ->
+	case const_int : { ListaComandos CaseEnd |
+	ListaCase |
+	{}
+CaseEnd ->
+	} break; |
+	}
+SwitchDefault ->
+	default: { ListaComandos CaseEnd |
+	{}
