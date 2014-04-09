@@ -9,10 +9,7 @@ namespace LinguagensFormais
     {
         static void Main(string[] args)
         {
-            int x, k, y;
-            for(x = 0, k = 7, y = x * 8; x < 10 && k >8; x++){}
-
-            bool debug = false;
+            bool debug = true;
 
             Console.WriteLine("Iniciado processo...");
 

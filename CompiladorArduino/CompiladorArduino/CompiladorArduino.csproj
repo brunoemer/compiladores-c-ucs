@@ -46,6 +46,8 @@
     <Compile Include="AnalisadorLexico.cs" />
     <Compile Include="AnalisadorSintatico.cs" />
     <Compile Include="Arquivo.cs" />
+    <Compile Include="Symbol.cs" />
+    <Compile Include="TableSymbol.cs" />
     <Compile Include="LexMap.cs" />
     <Compile Include="LineManager.cs" />
     <Compile Include="Program.cs" />
