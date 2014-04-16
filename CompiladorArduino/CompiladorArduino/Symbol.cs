@@ -9,7 +9,7 @@ namespace CompiladorArduino
     class Symbol
     {
         public String id;
-        public int type; // LexMap.Consts // id do token
+        public int type; // int, float...
         public String context;
 
         public Symbol(String _id, int _type)

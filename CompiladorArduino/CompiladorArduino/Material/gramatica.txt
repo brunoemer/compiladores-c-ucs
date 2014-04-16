@@ -16,7 +16,7 @@ ListaComandosX ->
 	ListaComandosX
 
 ListaComandos ->
-	DeclaraVar |
+	DeclaraVar | { currentContext = ListaComandos.context }
 	If |
 	While |
 	DoWhile |
@@ -24,42 +24,43 @@ ListaComandos ->
 	Switch |
 	Atribuicao |
 	Funcao |
-	ListaComandos
+	ListaComandos1 { ListaComandos1.context = ListaComandos.context }
 
 Declaracao -> 
-	TipoVar id DecB | 
-	void id ( DecC
+	TipoVar id { DecB.tipo = TipoVar.tipo; TableSymbol.add(id.cod, TipoVar.tipo); DecB.context = id.cod; } DecB | 
+	void id ( { DecC.context = id.cod } DecC
 DecB -> 
 	; | 
-	, id ListaVar | 
-	( DecC
+	, id { ListaVar.tipo = DecB.tipo; TableSymbol.add(id.cod, DecB.tipo) } ListaVar | 
+	( { DecC.context = DecB.context } DecC
 DecC -> 
-	(ListaDecParm) { ListaComandos Retorno }
+	{ ListaDecParm.context = DecC.context } ListaDecParm) {{ { ListaComandos.context = DecC.context } ListaComandos Retorno }}
 Retorno -> 
-	return Exp ; | {}
+	return Exp ; | 
+	""
 
 ListaDecParm -> 
-	TipoVar id ListaDecParmB | 
-	{}
+	TipoVar id { ListaDecParmB.context = ListaDecParm.context; TableSymbol.add(id.cod, TipoVar.tipo, ListaDecParm.context) } ListaDecParmB | 
+	""
 ListaDecParmB -> 
-	, TipoVar id ListaDecParmB | 
-	{}
+	, TipoVar id { ListaDecParmB1.context = ListaDecParmB.context; TableSymbol.add(id.cod, TipoVar.tipo, ListaDecParmB.context) } ListaDecParmB1 | 
+	""
 
 ListaVar -> 
-	, id ListaVar |
-	{}
+	, id { ListaVar1.tipo = TipoVar.tipo; TableSymbol.add(id.cod, ListaVar.tipo, currentContext) } ListaVar1 |
+	""
 
 DeclaraVar ->
-	TipoVar id ListaVar;
+	TipoVar id { ListaVar.tipo = TipoVar.tipo; TableSymbol.add(id.cod, ListaVar.tipo, currentContext) } ListaVar;
 
 TipoVar ->
-	int |
-	long |
-	float |
-	byte
+	int | { TipoVar.tipo = "int" }
+	long | { TipoVar.tipo = "long" }
+	float | { TipoVar.tipo = "float" }
+	byte //REMOVER
 
 Atribuicao -> 
-	id = Exp
+	id = Exp { Atribuicao.cod = Exp.cod + gen(=, id.cod, Exp.place) }
 
 Exp -> T R
 R -> || T R1
@@ -71,7 +72,7 @@ U -> Ɛ
 
 F -> G
 
-G -> ~G
+G -> ~G //alterar F -> ~G
 G -> H V
 
 V -> > H V1
@@ -94,54 +95,55 @@ Y -> % K Y1
 Y -> Ɛ
 
 K ->
+	id |
+	(Exp) |
 	int |
 	long |
-	byte |
+	byte | //REMOVER
 	float |
-	id |
-	(E) |
 	funcao()
 
 If ->
-	if ( Exp ) { ListaComandos } IfEnd
+	if ( Exp ) {{ ListaComandos }} IfEnd
 IfEnd ->
-	else { ListaComandos } |
+	else {{ ListaComandos }} |
 	else If |
-	{}
+	""
 	
 While ->
-	while ( Exp ) { ListaComandos }
+	while ( Exp ) {{ ListaComandos }}
 
 DoWhile ->
-	do { ListaComandos } while ( Exp );
+	do {{ ListaComandos }} while ( Exp );
 
 For ->
-	for ( ListaAtrib; Exp; ListaAtrib ) { ListaComandos }
+	for ( ListaAtrib; Exp; ListaAtrib ) {{ ListaComandos }}
 ListaAtrib ->
 	Atribuicao ListaAtribA
 ListaAtribA ->
 	, Atribuicao ListaAtribA |
-	{}
+	""
 
 Funcao ->
 	id ( ListaParam );
 	id.id ( ListaParam  );
 ListaParam -> 
 	Exp ListaParamRec | 
-	{}
+	""
 ListaParamRec -> 
 	, Exp ListaParamRec | 
-	{}
+	""
 	
+//REMOVER
 Switch ->
-	switch ( Exp ) { ListaCase SwitchDefault }
+	switch ( Exp ) {{ ListaCase SwitchDefault }}
 ListaCase ->
-	case const_int : { ListaComandos CaseEnd |
+	case const_int : {{ ListaComandos CaseEnd |
 	ListaCase |
-	{}
+	""
 CaseEnd ->
-	} break; |
-	}
+	}} break; |
+	}}
 SwitchDefault ->
-	default: { ListaComandos CaseEnd |
-	{}
+	default: {{ ListaComandos CaseEnd |
+	""

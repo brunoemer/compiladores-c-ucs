@@ -64,6 +64,7 @@
     <Content Include="Arquivos\saida_lex.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Material\gramatica_recursiva.txt" />
     <Content Include="Material\gramatica.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

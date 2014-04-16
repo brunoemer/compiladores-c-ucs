@@ -1,0 +1,36 @@
+﻿Atribuicao -> 
+	id = E { Atribuicao.cod = E.cod + gen(=, id.cod, E.place) }
+
+E -> E1 || T { E.place = criatemp(); E.cod = E1.cod || T.cod || gen(||, E.place, E1.place, T.place) }
+E -> T { E.cod = T.cod; E.place = T.place }
+
+T -> T1 && F { T.place = criatemp(); T.cod = T1.cod || F.cod || gen(&&, T.place, T1.place, F.place) }
+T -> F { T.cod = F.cod; T.place = F.place }
+
+F -> ~G { F.place = criatemp(); F.cod = G.cod || gen(~, F.place, G.place) }
+F -> G { F.cod = G.cod; F.place = G.place }
+
+G -> G1 > H  { G.place = criatemp(); G.cod = G1.cod || H.cod || gen(>, G.place, G1.place, H.place) }
+G -> G1 == H { G.place = criatemp(); G.cod = G1.cod || H.cod || gen(==, G.place, G1.place, H.place) }
+G -> G1 < H  { G.place = criatemp(); G.cod = G1.cod || H.cod || gen(<, G.place, G1.place, H.place) }
+G -> G1 >= H { G.place = criatemp(); G.cod = G1.cod || H.cod || gen(>=, G.place, G1.place, H.place) }
+G -> G1 != H { G.place = criatemp(); G.cod = G1.cod || H.cod || gen(!=, G.place, G1.place, H.place) }
+G -> G1 <= H { G.place = criatemp(); G.cod = G1.cod || H.cod || gen(<=, G.place, G1.place, H.place) }
+G -> H { G.cod = H.cod; G.place = H.place }
+
+H -> H1 + J { H.place = criatemp(); H.cod = H1.cod || J.cod || gen(+, H.place, H1.place, J.place) }
+H -> H1 - J { H.place = criatemp(); H.cod = H1.cod || J.cod || gen(-, H.place, H1.place, J.place) }
+H -> J { H.cod = J.cod; H.place = J.place }
+
+J -> J1 * K { J.place = criatemp(); J.cod = J1.cod || K.cod || gen(*, J.place, J1.place, K.place) }
+J -> J1 / K { J.place = criatemp(); J.cod = J1.cod || K.cod || gen(/, J.place, J1.place, K.place }
+J -> J1 % K { J.place = criatemp(); J.cod = J1.cod || K.cod || gen(%, J.place, J1.place, K.place }
+J -> K { J.cod = K.cod; J.place = K.place; J.tipo = K.tipo }
+
+K ->
+	id |       { K.place = id.cod; K.cod = "" }
+	(E) |      { K.place = E.place; K.cod = E.cod }
+	cteint |   { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "int" }
+	ctelong |  { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "long" }
+	ctefloar | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "floar" }
+	funcao()
