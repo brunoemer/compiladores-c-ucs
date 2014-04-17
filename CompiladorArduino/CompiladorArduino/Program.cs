@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace LinguagensFormais
+namespace CompiladorArduino
 {
     class Program
     {
@@ -24,13 +24,19 @@ namespace LinguagensFormais
                     sb.Append(item);
                 }
 
+                String ts = TableSymbol.getInstance().ToString();
+
                 if (debug)
                 {
-                    Console.WriteLine("Sintatico: "+codigo);
-                    Console.Write(sb.ToString());
+                    Console.WriteLine("Lex: " + sb.ToString());
+                    Console.WriteLine("TableSymbol: " + ts);
+                    Console.WriteLine("C3E: " + codigo);
                 }
 
                 Arquivo.Write(@"Arquivos/saida_lex.txt", sb.ToString());
+                Arquivo.Write(@"Arquivos/tablesymbol.txt", ts);
+                Arquivo.Write(@"Arquivos/codigo.c3e", codigo);
+
             }
             catch (AnalisadorException ae)
             {

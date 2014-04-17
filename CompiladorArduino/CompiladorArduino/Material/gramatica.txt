@@ -57,6 +57,7 @@ TipoVar ->
 	int | { TipoVar.tipo = "int" }
 	long | { TipoVar.tipo = "long" }
 	float | { TipoVar.tipo = "float" }
+	boolean | //ADICIONAR
 	byte //REMOVER
 
 Atribuicao -> 
@@ -72,7 +73,7 @@ U -> Ɛ
 
 F -> G
 
-G -> ~G //alterar F -> ~G
+G -> !G
 G -> H V
 
 V -> > H V1

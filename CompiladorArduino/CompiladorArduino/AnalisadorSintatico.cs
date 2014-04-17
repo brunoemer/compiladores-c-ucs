@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LinguagensFormais
+namespace CompiladorArduino
 {
     public class AnalisadorSintatico
     {
@@ -456,18 +456,7 @@ namespace LinguagensFormais
 
         public void ExpF()
         {
-            //alterado gramatica F -> ~G
-            AnalisadorLexico.Analisar();
-            if (TokenManager.Instance.TokenCode == LexMap.Consts["NAO"])
-            {
-                this.ExpG();
-            }
-            else
-            {
-                LineManager.Instance.ResetToLastPos();
-
-                this.ExpG();
-            }
+            this.ExpG();
         }
 
         public void ExpU()
@@ -491,15 +480,15 @@ namespace LinguagensFormais
 
         public void ExpG()
         {
-//            AnalisadorLexico.Analisar();
-//            if (TokenManager.Instance.TokenCode == LexMap.Consts["NAO"])
-//            {
-//                this.ExpG();
-//            }
-//            else
-//            {
+            AnalisadorLexico.Analisar();
+            if (TokenManager.Instance.TokenCode == LexMap.Consts["NAO"])
+            {
+                this.ExpG();
+            }
+            else
+            {
                 //ACHO
-//                LineManager.Instance.ResetToLastPos();
+                LineManager.Instance.ResetToLastPos();
 
                 this.ExpH();
 
@@ -507,7 +496,7 @@ namespace LinguagensFormais
                 this.ExpV();
 
                 LineManager.Instance.ResetToLastPos();
- //           }
+            }
         }
 
         public void ExpV()
