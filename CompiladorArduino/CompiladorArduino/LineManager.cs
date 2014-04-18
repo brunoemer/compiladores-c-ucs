@@ -32,7 +32,7 @@ namespace CompiladorArduino
         public LineManager()
         {
             this.LineIndex = 0;
-            this.Lines = Arquivo.Read(@"Arquivos/entrada2.txt");
+            this.Lines = Arquivo.Read(@"Arquivos/entrada.txt");
 
             this.LinesOut = new List<String>();
         }
