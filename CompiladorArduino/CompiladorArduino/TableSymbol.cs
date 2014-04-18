@@ -27,8 +27,19 @@ namespace CompiladorArduino
             return TableSymbol.instance;
         }
 
+        public void Add(String id, int type)
+        {
+            this.Add(new Symbol(id, type));
+        }
+
+        public void Add(String id, int type, String context)
+        {
+            this.Add(new Symbol(id, type, context));
+        }
+
         public void Add(Symbol s)
         {
+
             this.TabelaSimbolos.Add(s);
         }
 

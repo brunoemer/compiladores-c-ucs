@@ -1,5 +1,5 @@
 ﻿ProgArduino -> 
-	ListaProg
+	{ currentContext = GlobalContext } ListaProg
 
 ListaProg ->
 	ListaComandosX
@@ -16,7 +16,7 @@ ListaComandosX ->
 	ListaComandosX
 
 ListaComandos ->
-	DeclaraVar | { currentContext = ListaComandos.context }
+	DeclaraVar |
 	If |
 	While |
 	DoWhile |
@@ -24,26 +24,26 @@ ListaComandos ->
 	Switch |
 	Atribuicao |
 	Funcao |
-	ListaComandos1 { ListaComandos1.context = ListaComandos.context }
+	ListaComandos1
 
 Declaracao -> 
 	TipoVar id { DecB.tipo = TipoVar.tipo; TableSymbol.add(id.cod, TipoVar.tipo); DecB.context = id.cod; } DecB | 
-	void id ( { DecC.context = id.cod } DecC
+	void id ( { currentContext = id.cod } DecC
 DecB -> 
 	; | 
 	, id { ListaVar.tipo = DecB.tipo; TableSymbol.add(id.cod, DecB.tipo) } ListaVar | 
-	( { DecC.context = DecB.context } DecC
+	( { currentContext = DecB.context } DecC
 DecC -> 
-	{ ListaDecParm.context = DecC.context } ListaDecParm) {{ { ListaComandos.context = DecC.context } ListaComandos Retorno }}
+	ListaDecParm) {{ ListaComandos Retorno }} { currentContext = GlobalContext }
 Retorno -> 
 	return Exp ; | 
 	""
 
 ListaDecParm -> 
-	TipoVar id { ListaDecParmB.context = ListaDecParm.context; TableSymbol.add(id.cod, TipoVar.tipo, ListaDecParm.context) } ListaDecParmB | 
+	TipoVar id { TableSymbol.add(id.cod, TipoVar.tipo, currentContext) } ListaDecParmB | 
 	""
 ListaDecParmB -> 
-	, TipoVar id { ListaDecParmB1.context = ListaDecParmB.context; TableSymbol.add(id.cod, TipoVar.tipo, ListaDecParmB.context) } ListaDecParmB1 | 
+	, TipoVar id { TableSymbol.add(id.cod, TipoVar.tipo, currentContext) } ListaDecParmB1 | 
 	""
 
 ListaVar -> 

@@ -12,6 +12,8 @@ namespace CompiladorArduino
         {
             if (LineManager.Instance.ReadLine())
             {
+                TableSymbol.CurrentContext = TableSymbol.GlobalContext;
+
                 this.ProgArduino();
             }
 
@@ -197,9 +199,10 @@ namespace CompiladorArduino
         private void Declaracao()
         {
             int gramatica = 0;
+            int TVTipo = 0;
             try
             {
-                this.TipoVar();
+                this.TipoVar(out TVTipo);
             }
             catch (AnalisadorException) //o tipo ainda pode ser void
             {
@@ -214,7 +217,10 @@ namespace CompiladorArduino
                     throw new AnalisadorException("Um identificador era esperado.");
                 }
 
-                this.DecB();
+                TableSymbol.getInstance().Add(TokenManager.Instance.TokenSymbol, TVTipo);
+
+                String DContext = TokenManager.Instance.TokenSymbol;
+                this.DecB(TVTipo, DContext);
             }
             else
             {
@@ -229,6 +235,8 @@ namespace CompiladorArduino
                     throw new AnalisadorException("Um identificador era esperado.");
                 }
 
+                TableSymbol.CurrentContext = TokenManager.Instance.TokenSymbol;
+
                 AnalisadorLexico.Analisar();
                 if (TokenManager.Instance.TokenCode != LexMap.Consts["ABREPAR"])
                 {
@@ -239,7 +247,7 @@ namespace CompiladorArduino
             }
         }
 
-        private void DecB()
+        private void DecB(int DBTipo, String DBContext)
         {
             AnalisadorLexico.Analisar();
 
@@ -256,7 +264,9 @@ namespace CompiladorArduino
                     throw new AnalisadorException("Um identificador era esperado.");
                 }
 
-                this.ListaVar();
+                TableSymbol.getInstance().Add(TokenManager.Instance.TokenSymbol, DBTipo);
+
+                this.ListaVar(DBTipo);
 
                 if (TokenManager.Instance.TokenCode != LexMap.Consts["PONTOVIRGULA"])
                 {
@@ -265,6 +275,8 @@ namespace CompiladorArduino
             }
             else if (TokenManager.Instance.TokenCode == LexMap.Consts["ABREPAR"])
             {
+                TableSymbol.CurrentContext = DBContext;
+
                 this.DecC();
             }
             else
@@ -299,6 +311,8 @@ namespace CompiladorArduino
             {
                 throw new AnalisadorException("O token } era esperado.");
             }
+
+            TableSymbol.CurrentContext = TableSymbol.GlobalContext;
         }
 
         private void Retorno()
@@ -330,9 +344,10 @@ namespace CompiladorArduino
          */
         private void ListaDecParm()
         {
+            int TVTipo = 0;
             try
             {
-                this.TipoVar();
+                this.TipoVar(out TVTipo);
             }
             catch (AnalisadorException) {
                 //vazio
@@ -347,6 +362,8 @@ namespace CompiladorArduino
                 throw new AnalisadorException("Um identificador era esperado");
             }
 
+            TableSymbol.getInstance().Add(TokenManager.Instance.TokenSymbol, TVTipo, TableSymbol.CurrentContext);
+
             this.ListaDecParmB();
         }
 
@@ -355,7 +372,8 @@ namespace CompiladorArduino
             AnalisadorLexico.Analisar();
             if (TokenManager.Instance.TokenCode == LexMap.Consts["VIRGULA"])
             {
-                this.TipoVar();
+                int TVTipo = 0;
+                this.TipoVar(out TVTipo);
 
                 AnalisadorLexico.Analisar();
                 if (TokenManager.Instance.TokenCode != LexMap.Consts["ID"])
@@ -363,13 +381,16 @@ namespace CompiladorArduino
                     throw new AnalisadorException("Um identificador era esperado");
                 }
 
+                TableSymbol.getInstance().Add(TokenManager.Instance.TokenSymbol, TVTipo, TableSymbol.CurrentContext);
+
                 this.ListaDecParmB();
             }
         }
 
         private void DeclaraVar()
         {
-            this.TipoVar();
+            int TVTipo = 0;
+            this.TipoVar(out TVTipo);
 
             AnalisadorLexico.Analisar();
 
@@ -378,7 +399,9 @@ namespace CompiladorArduino
                 throw new AnalisadorException("Um identificador era esperado");
             }
 
-            this.ListaVar();
+            TableSymbol.getInstance().Add(TokenManager.Instance.TokenSymbol, TVTipo, TableSymbol.CurrentContext);
+
+            this.ListaVar(TVTipo);
 
             if (TokenManager.Instance.TokenCode != LexMap.Consts["PONTOVIRGULA"])
             {
@@ -386,7 +409,7 @@ namespace CompiladorArduino
             }
         }
 
-        public void TipoVar()
+        public void TipoVar(out int TVTipo)
         {
             AnalisadorLexico.Analisar();
 
@@ -397,9 +420,11 @@ namespace CompiladorArduino
             {
                 throw new AnalisadorException("Tipo de variável não pode ser identificado.");
             }
+
+            TVTipo = TokenManager.Instance.TokenCode;
         }
 
-        public void ListaVar()
+        public void ListaVar(int LVTipo)
         {
             AnalisadorLexico.Analisar();
 
@@ -409,7 +434,9 @@ namespace CompiladorArduino
 
                 if (TokenManager.Instance.TokenCode == LexMap.Consts["ID"])
                 {
-                    this.ListaVar();
+                    TableSymbol.getInstance().Add(TokenManager.Instance.TokenSymbol, LVTipo, TableSymbol.CurrentContext);
+
+                    this.ListaVar(LVTipo);
                 }
                 else
                 {

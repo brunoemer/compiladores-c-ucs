@@ -1,0 +1,6 @@
+﻿int i, j;
+float a;
+
+int funcao(int b){
+	float c;
+}

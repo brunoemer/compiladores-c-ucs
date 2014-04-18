@@ -58,6 +58,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Arquivos\entrada2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Arquivos\entrada.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
