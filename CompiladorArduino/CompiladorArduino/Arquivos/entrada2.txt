@@ -1,6 +1,6 @@
 ﻿int i, j, k, a;
 
-float a, x;
+float b, x;
 
 byte abd;
 
@@ -20,9 +20,9 @@ i = x;
 
 if(a){
 	if(a){
-		int j;
+		int jj;
 	}else if(1){
-		float x;
+		float xx;
 	}
 
 }
@@ -52,7 +52,7 @@ int w;
 
 a = 8;
 
-int x(int a, int x){ }
+int xxx(int a, int x){ }
 
 void testefuncao(float kgb, byte carro){
 	int a, b, c;

@@ -28,10 +28,10 @@ J -> J1 % K { J.place = criatemp(); J.cod = J1.cod || K.cod || gen(%, J.place, J
 J -> K { J.cod = K.cod; J.place = K.place; J.tipo = K.tipo }
 
 K ->
-	id |       { K.place = id.cod; K.cod = ""; K.tipo = TableSymbol.getType(id.cod) }
+	id |       { K.place = id.cod; K.cod = ""; TableSymbol.Exists(id.cod); K.tipo = TableSymbol.getType(id.cod) }
 	(E) |      { K.place = E.place; K.cod = E.cod; K.tipo = E.tipo }
 	cteint |   { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "int" }
 	ctelong |  { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "long" }
 	ctefloat | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "float" }
-	cteboolean | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "boolean" }
-	funcao()
+	cteboolean | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "boolean" } // em c nao existe, como tratar?
+	Funcao

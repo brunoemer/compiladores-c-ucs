@@ -37,9 +37,17 @@ namespace CompiladorArduino
             this.Add(new Symbol(id, type, context));
         }
 
+        public void Add(String id, int type, StructureType stype)
+        {
+            this.Add(new Symbol(id, type, stype));
+        }
+
         public void Add(Symbol s)
         {
-
+            if (this.Exists(s.id))
+            {
+                throw new AnalisadorException("Identificador já declarado.");
+            }
             this.TabelaSimbolos.Add(s);
         }
 
@@ -72,12 +80,40 @@ namespace CompiladorArduino
             {
                 return false;
             }
+            return true;
+        }
 
+        public bool ExistsVar(String id)
+        {
+            if (!this.Exists(id))
+            {
+                throw new AnalisadorException("Identificador não declarado.");
+            }
+            return true;
+        }
+
+        public bool ExistsFunction(String id)
+        {
+            bool hasFunc = false;
+            foreach (Symbol s in this.TabelaSimbolos)
+            {
+                if (s.id.Equals(id) && s.context.Equals(CurrentContext) && s.sType == StructureType.Function)
+                {
+                    hasFunc = true;
+                    break;
+                }
+            }
+
+            if (!this.Exists(id) || !hasFunc)
+            {
+                throw new AnalisadorException("Função não declarada. Idenficador: "+id);
+            }
             return true;
         }
 
         public int CalcType(int t1, int t2, int op)
         {
+            // ver combinacoes com op, testar no c
             if (op == LexMap.Consts["OU"] ||
                 op == LexMap.Consts["E"] ||
                 op == LexMap.Consts["MAIOR"] ||
@@ -89,7 +125,7 @@ namespace CompiladorArduino
             {
                 return LexMap.Consts["LOGICO"];
             }
-            // ver combinacoes com op
+
             if (t1 == LexMap.Consts["CONSTFLOAT"] || t2 == LexMap.Consts["CONSTFLOAT"])
             {
                 return LexMap.Consts["CONSTFLOAT"];

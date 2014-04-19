@@ -56,6 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Arquivos\codigo.c3e" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Arquivos\entrada.txt">
@@ -67,6 +68,7 @@
     <Content Include="Arquivos\saida_lex.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Arquivos\tablesymbol.txt" />
     <Content Include="Material\gramatica_recursiva.txt" />
     <Content Include="Material\gramatica.txt" />
   </ItemGroup>

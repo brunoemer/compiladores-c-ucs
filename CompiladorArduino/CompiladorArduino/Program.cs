@@ -28,7 +28,7 @@ namespace CompiladorArduino
 
                 if (debug)
                 {
-                    //Console.WriteLine("Lex:\n" + sb.ToString());
+                    Console.WriteLine("Lex:\n" + sb.ToString());
                     Console.WriteLine("TableSymbol:\n" + ts);
                     //Console.WriteLine("C3E:\n" + codigo);
                 }

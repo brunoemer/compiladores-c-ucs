@@ -1,7 +1,16 @@
 ﻿int i, j;
 float a;
 
-int soma(int b){
-	float c;
-	return b + c;
+void teste(){
+
 }
+
+int soma(int b){
+	float a, c, d;
+	c = a + b;
+	return b + c + d;
+}
+
+
+int end, fim;
+end = fim;

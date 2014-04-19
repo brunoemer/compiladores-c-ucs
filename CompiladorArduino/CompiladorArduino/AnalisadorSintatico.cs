@@ -22,10 +22,10 @@ namespace CompiladorArduino
 
         private void ProgArduino()
         {
-            this.ListaComandosX();
+            this.ListaComandosGlobal();
         }
 
-        private void ListaComandosX()
+        private void ListaComandosGlobal()
         {
             bool recur_flag = false;
 
@@ -86,6 +86,7 @@ namespace CompiladorArduino
 
                                     if (TokenManager.Instance.TokenCode == LexMap.Consts["ID"])
                                     {
+                                        String LIdCod = TokenManager.Instance.TokenSymbol;
                                         //atribuição
                                         this.Atribuicao();
                                         recur_flag = true;
@@ -94,7 +95,7 @@ namespace CompiladorArduino
                                         if (TokenManager.Instance.TokenCode == LexMap.Consts["ABREPAR"] || TokenManager.Instance.TokenCode == LexMap.Consts["PONTO"])
                                         {
                                             //LineManager.Instance.ResetToLastPos(); // nao retrocede por causa da Atribuicao
-                                            this.Funcao();
+                                            this.Funcao(LIdCod);
                                             AnalisadorLexico.Analisar();
                                         }
 
@@ -107,7 +108,7 @@ namespace CompiladorArduino
             //recursão
             if (recur_flag == true)
             {
-                this.ListaComandosX();
+                this.ListaComandosGlobal();
             }
         }
 
@@ -166,6 +167,7 @@ namespace CompiladorArduino
             
             if (TokenManager.Instance.TokenCode == LexMap.Consts["ID"])
             {
+                String LIdCod = TokenManager.Instance.TokenSymbol;
                 //atribuição
                 this.Atribuicao();
                 recur_flag = true;
@@ -174,7 +176,7 @@ namespace CompiladorArduino
                 if (TokenManager.Instance.TokenCode == LexMap.Consts["ABREPAR"] || TokenManager.Instance.TokenCode == LexMap.Consts["PONTO"])
                 {
                     //LineManager.Instance.ResetToLastPos(); // nao retrocede por causa da Atribuicao
-                    this.Funcao();
+                    this.Funcao(LIdCod);
                     AnalisadorLexico.Analisar();
                 }
                 
@@ -217,13 +219,12 @@ namespace CompiladorArduino
                     throw new AnalisadorException("Um identificador era esperado.");
                 }
 
-                TableSymbol.getInstance().Add(TokenManager.Instance.TokenSymbol, TVTipo);
-
-                String DContext = TokenManager.Instance.TokenSymbol;
-                this.DecB(TVTipo, DContext);
+                String DIdCod = TokenManager.Instance.TokenSymbol;
+                this.DecB(TVTipo, DIdCod);
             }
             else
             {
+                TVTipo = TokenManager.Instance.TokenCode;
                 if (TokenManager.Instance.TokenCode != LexMap.Consts["VOID"])
                 {
                     throw new AnalisadorException("Tipo de variável não pode ser identificado.");
@@ -234,6 +235,8 @@ namespace CompiladorArduino
                 {
                     throw new AnalisadorException("Um identificador era esperado.");
                 }
+
+                TableSymbol.getInstance().Add(TokenManager.Instance.TokenSymbol, TVTipo, StructureType.Function);
 
                 TableSymbol.CurrentContext = TokenManager.Instance.TokenSymbol;
 
@@ -247,16 +250,20 @@ namespace CompiladorArduino
             }
         }
 
-        private void DecB(int DBTipo, String DBContext)
+        private void DecB(int DBTipo, String DBIdCod)
         {
             AnalisadorLexico.Analisar();
 
             if (TokenManager.Instance.TokenCode == LexMap.Consts["PONTOVIRGULA"])
             {
+                TableSymbol.getInstance().Add(DBIdCod, DBTipo);
+
                 return;
             }
             else if (TokenManager.Instance.TokenCode == LexMap.Consts["VIRGULA"])
             {
+                TableSymbol.getInstance().Add(DBIdCod, DBTipo);
+
                 AnalisadorLexico.Analisar();
 
                 if (TokenManager.Instance.TokenCode != LexMap.Consts["ID"])
@@ -275,7 +282,9 @@ namespace CompiladorArduino
             }
             else if (TokenManager.Instance.TokenCode == LexMap.Consts["ABREPAR"])
             {
-                TableSymbol.CurrentContext = DBContext;
+                TableSymbol.getInstance().Add(DBIdCod, DBTipo, StructureType.Function);
+
+                TableSymbol.CurrentContext = DBIdCod;
 
                 this.DecC();
             }
@@ -643,6 +652,7 @@ namespace CompiladorArduino
         {
             AnalisadorLexico.Analisar();
             int tkc = TokenManager.Instance.TokenCode;
+            String EIdCod = TokenManager.Instance.TokenSymbol;
 
             if (tkc == LexMap.Consts["CONSTINTEIRO"] ||
                 tkc == LexMap.Consts["CONSTFLOAT"] ||
@@ -664,11 +674,13 @@ namespace CompiladorArduino
                     AnalisadorLexico.Analisar();
                     if (TokenManager.Instance.TokenCode == LexMap.Consts["ABREPAR"] || TokenManager.Instance.TokenCode == LexMap.Consts["PONTO"])
                     {
-                        this.Funcao();
+                        this.Funcao(EIdCod);
                     }
                     else
                     {
                         LineManager.Instance.ResetToLastPos();
+
+                        TableSymbol.getInstance().ExistsVar(EIdCod);
                     }
                 }
 
@@ -696,6 +708,8 @@ namespace CompiladorArduino
 
         public void Atribuicao()
         {
+            TableSymbol.getInstance().ExistsVar(TokenManager.Instance.TokenSymbol);
+
             AnalisadorLexico.Analisar();
             if (TokenManager.Instance.TokenCode == LexMap.Consts["ATRIBUICAO"])
             {
@@ -1042,11 +1056,13 @@ namespace CompiladorArduino
             }
         }
 
-        private void Funcao()
+        private void Funcao(String FIdCod)
         {
             //if (TokenManager.Instance.TokenCode == LexMap.Consts["ID"])
             //{
             //    AnalisadorLexico.Analisar();
+                TableSymbol.getInstance().ExistsFunction(FIdCod);
+
                 if (TokenManager.Instance.TokenCode == LexMap.Consts["PONTO"])
                 {
                     AnalisadorLexico.Analisar();

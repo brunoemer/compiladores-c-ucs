@@ -2,9 +2,9 @@
 	{ currentContext = GlobalContext } ListaProg
 
 ListaProg ->
-	ListaComandosX
+	ListaComandosGlobal
 	
-ListaComandosX ->
+ListaComandosGlobal ->
 	Declaracao |
 	If |
 	While |
@@ -13,7 +13,7 @@ ListaComandosX ->
 	Switch |
 	Atribuicao |
 	Funcao |
-	ListaComandosX
+	ListaComandosGlobal
 
 ListaComandos ->
 	DeclaraVar |
@@ -27,12 +27,12 @@ ListaComandos ->
 	ListaComandos1
 
 Declaracao -> 
-	TipoVar id { DecB.tipo = TipoVar.tipo; TableSymbol.add(id.cod, TipoVar.tipo); DecB.context = id.cod; } DecB | 
-	void id ( { currentContext = id.cod } DecC
+	TipoVar id { DecB.tipo = TipoVar.tipo; DecB.idCod = id.cod; } DecB | 
+	void id ( { TableSymbol.add(id.cod, id.tipo, StructureType.Function); currentContext = id.cod } DecC
 DecB -> 
-	; | 
-	, id { ListaVar.tipo = DecB.tipo; TableSymbol.add(id.cod, DecB.tipo) } ListaVar | 
-	( { currentContext = DecB.context } DecC
+	; { TableSymbol.add(DecB.idCod, DecB.tipo) } | 
+	, { TableSymbol.add(DecB.idCod, DecB.tipo) } id { ListaVar.tipo = DecB.tipo; TableSymbol.add(id.cod, DecB.tipo) } ListaVar | 
+	( { TableSymbol.add(DecB.idCod, DecB.tipo, StructureType.Function); currentContext = DecB.idCod } DecC
 DecC -> 
 	ListaDecParm) {{ ListaComandos Retorno }} { currentContext = GlobalContext }
 Retorno -> 
@@ -57,11 +57,11 @@ TipoVar ->
 	int | { TipoVar.tipo = "int" }
 	long | { TipoVar.tipo = "long" }
 	float | { TipoVar.tipo = "float" }
-	boolean | //ADICIONAR
 	byte //REMOVER
 
+// Adicionar atribuicao com operadores reduzidos(+= *= ...)
 Atribuicao -> 
-	id = Exp { Atribuicao.cod = Exp.cod + gen(=, id.cod, Exp.place) }
+	id { TableSymbol.ExistsVar(id.cod) } = Exp { Atribuicao.cod = Exp.cod + gen(=, id.cod, Exp.place) }
 
 Exp -> T R
 R -> || T R1
@@ -96,13 +96,13 @@ Y -> % K Y1
 Y -> Ɛ
 
 K ->
-	id |
+	id { TableSymbol.ExistsVar(id.cod) } |
 	(Exp) |
 	int |
 	long |
 	byte | //REMOVER
 	float |
-	funcao()
+	Funcao
 
 If ->
 	if ( Exp ) {{ ListaComandos }} IfEnd
@@ -111,6 +111,7 @@ IfEnd ->
 	else If |
 	""
 	
+// Falta adicionar break e continue
 While ->
 	while ( Exp ) {{ ListaComandos }}
 
@@ -126,8 +127,8 @@ ListaAtribA ->
 	""
 
 Funcao ->
-	id ( ListaParam );
-	id.id ( ListaParam  );
+	id ( { TableSymbol.ExistsFunction(id.cod) } ListaParam );
+	id.id ( ListaParam  ); // REMOVER?
 ListaParam -> 
 	Exp ListaParamRec | 
 	""
@@ -148,3 +149,6 @@ CaseEnd ->
 SwitchDefault ->
 	default: {{ ListaComandos CaseEnd |
 	""
+
+
+// Separar blocos de comandos dos loops, if e funcao {}
