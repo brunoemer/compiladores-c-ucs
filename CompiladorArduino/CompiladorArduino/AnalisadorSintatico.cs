@@ -12,21 +12,29 @@ namespace CompiladorArduino
         {
             if (LineManager.Instance.ReadLine())
             {
+                String ProgCod;
+
                 TableSymbol.CurrentContext = TableSymbol.GlobalContext;
 
-                this.ProgArduino();
+                this.ProgArduino(out ProgCod);
+
+                return ProgCod;
             }
 
             return "";
         }
 
-        private void ProgArduino()
+        private void ProgArduino(out String ProgCod)
         {
-            this.ListaComandosGlobal();
+            String LCGCod;
+            this.ListaComandosGlobal(out LCGCod);
+
+            ProgCod = LCGCod;
         }
 
-        private void ListaComandosGlobal()
+        private void ListaComandosGlobal(out String LCGCod)
         {
+            LCGCod = "";
             bool recur_flag = false;
 
             AnalisadorLexico.Analisar();
@@ -88,7 +96,9 @@ namespace CompiladorArduino
                                     {
                                         String LIdCod = TokenManager.Instance.TokenSymbol;
                                         //atribuição
-                                        this.Atribuicao();
+                                        String AtribCod;
+                                        this.Atribuicao(out AtribCod);
+                                        LCGCod += AtribCod;
                                         recur_flag = true;
 
                                         //funcao
@@ -108,13 +118,16 @@ namespace CompiladorArduino
             //recursão
             if (recur_flag == true)
             {
-                this.ListaComandosGlobal();
+                String LCG1Cod;
+                this.ListaComandosGlobal(out LCG1Cod);
+                LCGCod += LCG1Cod;
             }
         }
 
 
-        private void ListaComandos()
+        private void ListaComandos(out String LCCod)
         {
+            LCCod = "";
             bool recur_flag = false;
 
             AnalisadorLexico.Analisar();
@@ -169,7 +182,9 @@ namespace CompiladorArduino
             {
                 String LIdCod = TokenManager.Instance.TokenSymbol;
                 //atribuição
-                this.Atribuicao();
+                String AtribCod;
+                this.Atribuicao(out AtribCod);
+                LCCod += AtribCod;
                 recur_flag = true;
                 
                 //funcao
@@ -189,7 +204,9 @@ namespace CompiladorArduino
             //recursão
             if (recur_flag == true)
             {
-                this.ListaComandos();
+                String LC1Cod;
+                this.ListaComandos(out LC1Cod);
+                LCCod += LC1Cod;
             }
         }
 
@@ -311,7 +328,8 @@ namespace CompiladorArduino
                 throw new AnalisadorException("O token { era esperado.");
             }
 
-            this.ListaComandos();
+            String LCCod;
+            this.ListaComandos(out LCCod);
 
             this.Retorno();
 
@@ -526,8 +544,9 @@ namespace CompiladorArduino
                 //ACHO
                 LineManager.Instance.ResetToLastPos();
 
-                this.ExpH();
-
+                String HCod, HPlace;
+                int HTipo;
+                this.ExpH(out HCod, out HPlace, out HTipo);
 
                 this.ExpV();
 
@@ -573,29 +592,54 @@ namespace CompiladorArduino
 
             if (is_valid_flag)
             {
-                this.ExpH();
+                String HCod, HPlace;
+                int HTipo;
+                this.ExpH(out HCod, out HPlace, out HTipo);
 
                 this.ExpV();
             }
         }
 
-        public void ExpH()
+        public void ExpH(out String HCod, out String HPlace, out int HTipo)
         {
-            this.ExpJ();
+            String JCod, JPlace, Xhc, Xhp;
+            int JTipo, Xht;
+            this.ExpJ(out JCod, out JPlace, out JTipo);
+            Xhc = JCod;
+            Xhp = JPlace;
+            Xht = JTipo;
 
-            this.ExpX();
+            String Xsc, Xsp;
+            int Xst;
+            this.ExpX(Xhc, Xhp, Xht, out Xsc, out Xsp, out Xst);
+            HCod = Xsc;
+            HPlace = Xsp;
+            HTipo = Xst;
+
+            //REMOVER comentario abaixo, teste + * ...
+            //LineManager.Instance.ResetToLastPos();
+        }
+
+        public void ExpJ(out String JCod, out String JPlace, out int JTipo)
+        {
+            String KCod, KPlace, Yhc, Yhp;
+            int KTipo, Yht;
+            this.ExpK(out KCod, out KPlace, out KTipo);
+            Yhc = KCod;
+            Yhp = KPlace;
+            Yht = KTipo;
+
+            String Ysc, Ysp;
+            int Yst;
+            this.ExpY(Yhc, Yhp, Yht, out Ysc, out Ysp, out Yst);
+            JCod = Ysc;
+            JPlace = Ysp;
+            JTipo = Yst;
+
             LineManager.Instance.ResetToLastPos();
         }
 
-        public void ExpJ()
-        {
-            this.ExpK();
-
-            this.ExpY();
-            LineManager.Instance.ResetToLastPos();
-        }
-
-        public void ExpX()
+        public void ExpX(String Xhc, String Xhp, int Xht, out String Xsc, out String Xsp, out int Xst)
         {
             AnalisadorLexico.Analisar();
             Int32 opType = TokenManager.Instance.TokenCode;
@@ -613,13 +657,29 @@ namespace CompiladorArduino
 
             if (is_valid_flag)
             {
-                this.ExpJ();
+                String JCod, JPlace, X1hc, X1hp;
+                int JTipo, X1ht;
+                this.ExpJ(out JCod, out JPlace, out JTipo);
+                X1hp = this.CriaTemp();
+                X1hc = Xhc + JCod + X1hp + " = " + Xhp + " + " + JPlace + Environment.NewLine;
+                X1ht = TableSymbol.getInstance().CalcType(opType, Xht, JTipo);
 
-                this.ExpX();
+                String X1sc, X1sp;
+                int X1st;
+                this.ExpX(X1hc, X1hp, X1ht, out X1sc, out X1sp, out X1st);
+                Xsc = X1hc;
+                Xsp = X1hp;
+                Xst = X1ht;
+            }
+            else
+            {
+                Xsp = Xhp;
+                Xsc = Xhc;
+                Xst = Xht;
             }
         }
 
-        public void ExpY()
+        public void ExpY(String Yhc, String Yhp, int Yht, out String Ysc, out String Ysp, out int Yst)
         {
             AnalisadorLexico.Analisar();
             Int32 opType = TokenManager.Instance.TokenCode;
@@ -642,14 +702,33 @@ namespace CompiladorArduino
 
             if (is_valid_flag)
             {
-                this.ExpK();
+                String KCod, KPlace, Y1hc, Y1hp;
+                int KTipo, Y1ht;
+                this.ExpK(out KCod, out KPlace, out KTipo);
+                Y1hp = this.CriaTemp();
+                Y1hc = Yhc + KCod + Y1hp + " = " + Yhp + " * " + KPlace + Environment.NewLine;
+                Y1ht = TableSymbol.getInstance().CalcType(opType, Yht, KTipo);
 
-                this.ExpY();
+                String Y1sc, Y1sp;
+                int Y1st;
+                this.ExpY(Y1hc, Y1hp, Y1ht, out Y1sc, out Y1sp, out Y1st);
+                Ysc = Y1hc;
+                Ysp = Y1hp;
+                Yst = Y1ht;
+            }
+            else
+            {
+                Ysp = Yhp;
+                Ysc = Yhc;
+                Yst = Yht;
             }
         }
 
-        public void ExpK()
+        public void ExpK(out String KCod, out String KPlace, out int KTipo)
         {
+            KCod = "";
+            KPlace = "";
+            KTipo = 0;
             AnalisadorLexico.Analisar();
             int tkc = TokenManager.Instance.TokenCode;
             String EIdCod = TokenManager.Instance.TokenSymbol;
@@ -674,14 +753,35 @@ namespace CompiladorArduino
                     AnalisadorLexico.Analisar();
                     if (TokenManager.Instance.TokenCode == LexMap.Consts["ABREPAR"] || TokenManager.Instance.TokenCode == LexMap.Consts["PONTO"])
                     {
+                        //falta fazer
                         this.Funcao(EIdCod);
                     }
                     else
                     {
                         LineManager.Instance.ResetToLastPos();
-
+                        
                         TableSymbol.getInstance().ExistsVar(EIdCod);
+                        KPlace = EIdCod;
+                        KTipo = TableSymbol.getInstance().GetType(EIdCod);
                     }
+                }
+                else if (tkc == LexMap.Consts["CONSTINTEIRO"])
+                {
+                    KPlace = this.CriaTemp();
+                    KCod = KPlace + " = " + tkc + Environment.NewLine;
+                    KTipo = LexMap.Consts["INTEIRO"];
+                }
+                else if (tkc == LexMap.Consts["CONSTFLOAT"])
+                {
+                    KPlace = this.CriaTemp();
+                    KCod = KPlace + " = " + tkc + Environment.NewLine;
+                    KTipo = LexMap.Consts["FLOAT"];
+                }
+                else if (tkc == LexMap.Consts["TRUE"] || tkc == LexMap.Consts["FALSE"]) // ver se esta certo
+                {
+                    KPlace = this.CriaTemp();
+                    KCod = KPlace + " = " + tkc + Environment.NewLine;
+                    KTipo = LexMap.Consts["LOGICO"];
                 }
 
                 return;
@@ -689,6 +789,7 @@ namespace CompiladorArduino
 
             if (TokenManager.Instance.TokenCode == LexMap.Consts["ABREPAR"])
             {
+                //falta fazer
                 this.Exp();
 
                 if (TokenManager.Instance.TokenCode != LexMap.Consts["FECHAPAR"])
@@ -706,15 +807,24 @@ namespace CompiladorArduino
 
         #endregion Expressao
 
-        public void Atribuicao()
+        public void Atribuicao(out String AtribCod)
         {
-            TableSymbol.getInstance().ExistsVar(TokenManager.Instance.TokenSymbol);
+            AtribCod = "";
+            String id = TokenManager.Instance.TokenSymbol;
+            TableSymbol.getInstance().ExistsVar(id);
 
             AnalisadorLexico.Analisar();
+            String ExpCod, ExpPlace;
+            int ExpTipo;
             if (TokenManager.Instance.TokenCode == LexMap.Consts["ATRIBUICAO"])
             {
-                this.Exp();
+                //this.Exp(out ExpCod, out ExpPlace, out ExpTipo);
+                this.ExpH(out ExpCod, out ExpPlace, out ExpTipo);
+                //verificar tipo ExpTipo
+
+                AtribCod = ExpCod + id + " = " + ExpPlace + Environment.NewLine;
             }
+
         }
 
         private void If()
@@ -739,8 +849,9 @@ namespace CompiladorArduino
                 {
                     throw new AnalisadorException("O token { era esperado");
                 }
-                
-                this.ListaComandos();
+
+                String LCCod;
+                this.ListaComandos(out LCCod);
 
                 if (TokenManager.Instance.TokenCode != LexMap.Consts["FECHACHAVES"])
                 {
@@ -759,7 +870,8 @@ namespace CompiladorArduino
                 AnalisadorLexico.Analisar();
                 if (TokenManager.Instance.TokenCode == LexMap.Consts["ABRECHAVES"])
                 {
-                    this.ListaComandos();
+                    String LCCod;
+                    this.ListaComandos(out LCCod);
 
                     if (TokenManager.Instance.TokenCode != LexMap.Consts["FECHACHAVES"])
                     {
@@ -811,7 +923,8 @@ namespace CompiladorArduino
                     throw new AnalisadorException("O token { era esperado");
                 }
 
-                this.ListaComandos();
+                String LCCod;
+                this.ListaComandos(out LCCod);
 
                 if (TokenManager.Instance.TokenCode != LexMap.Consts["FECHACHAVES"])
                 {
@@ -830,7 +943,8 @@ namespace CompiladorArduino
                     throw new AnalisadorException("O token { era esperado");
                 }
 
-                this.ListaComandos();
+                String LCCod;
+                this.ListaComandos(out LCCod);
 
                 if (TokenManager.Instance.TokenCode != LexMap.Consts["FECHACHAVES"])
                 {
@@ -900,7 +1014,8 @@ namespace CompiladorArduino
                     throw new AnalisadorException("O token { era esperado");
                 }
 
-                this.ListaComandos();
+                String LCCod;
+                this.ListaComandos(out LCCod);
 
                 if (TokenManager.Instance.TokenCode != LexMap.Consts["FECHACHAVES"])
                 {
@@ -916,7 +1031,8 @@ namespace CompiladorArduino
             {
                 throw new AnalisadorException("O token identificador era esperado");
             }
-            this.Atribuicao();
+            String AtribCod;
+            this.Atribuicao(out AtribCod);
 
             this.ListaAtribA();
         }
@@ -931,7 +1047,8 @@ namespace CompiladorArduino
                     throw new AnalisadorException("O token identificador era esperado");
                 }
 
-                this.Atribuicao();
+                String AtribCod;
+                this.Atribuicao(out AtribCod);
 
                 this.ListaAtribA();
             }
@@ -995,7 +1112,8 @@ namespace CompiladorArduino
                     throw new AnalisadorException("O token { era esperado");
                 }
 
-                this.ListaComandos();
+                String LCCod;
+                this.ListaComandos(out LCCod);
 
                 this.CaseEnd();
 
@@ -1046,7 +1164,8 @@ namespace CompiladorArduino
                     throw new AnalisadorException("O token { era esperado");
                 }
 
-                this.ListaComandos();
+                String LCCod;
+                this.ListaComandos(out LCCod);
 
                 this.CaseEnd();
             }
@@ -1109,6 +1228,14 @@ namespace CompiladorArduino
 
                 this.ListaParamRec();
             }
+        }
+
+        private int nTemp;
+        private String CriaTemp()
+        {
+            String res = "T" + this.nTemp;
+            this.nTemp++;
+            return res;
         }
     }
 }

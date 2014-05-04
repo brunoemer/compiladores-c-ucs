@@ -111,7 +111,7 @@ namespace CompiladorArduino
             return true;
         }
 
-        public int CalcType(int t1, int t2, int op)
+        public int CalcType(int op, int t1, int t2)
         {
             // ver combinacoes com op, testar no c
             if (op == LexMap.Consts["OU"] ||

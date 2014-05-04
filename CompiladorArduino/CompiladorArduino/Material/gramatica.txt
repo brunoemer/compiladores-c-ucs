@@ -59,7 +59,6 @@ TipoVar ->
 	float | { TipoVar.tipo = "float" }
 	byte //REMOVER
 
-// Adicionar atribuicao com operadores reduzidos(+= *= ...)
 Atribuicao -> 
 	id { TableSymbol.ExistsVar(id.cod) } = Exp { Atribuicao.cod = Exp.cod + gen(=, id.cod, Exp.place) }
 
@@ -72,10 +71,9 @@ U -> && F U1
 U -> Ɛ
 
 F -> G
-
 G -> !G
-G -> H V
 
+G -> H V
 V -> > H V1
 V -> == H V1
 V -> < H V1
@@ -84,25 +82,31 @@ V -> != H V1
 V -> <= H V1
 V -> Ɛ
 
-H -> J X
-X -> + J X1
-X -> - J X1
-X -> Ɛ
+H -> J { X.hc = J.cod; X.hp = J.place; X.ht = J.tipo } X { H.cod = X.sc; H.place = X.sp; H.tipo = X.st }
+X -> + J { X1.hp = criatemp(); X1.hc = X.hc + J.cod + gen(+, X1.hp, X.hp, J.place); 
+			X1.ht = TableSymbol.CalcType(+, X.ht, J.tipo) } X1 { X.sp = X1.sp; X.sc = X1.sc; X.st = X1.st }
+X -> - J { X1.hp = criatemp(); X1.hc = X.hc + J.cod + gen(-, X1.hp, X.hp, J.place); 
+			X1.ht = TableSymbol.CalcType(-, X.ht, J.tipo) } X1 { X.sp = X1.sp; X.sc = X1.sc; X.st = X1.st }
+X -> Ɛ { X.sp = X.hp; X.sc = X.hc; X.st = X.ht }
 
-J -> K Y
-Y -> * K Y1
-Y -> / K Y1
-Y -> % K Y1
-Y -> Ɛ
+J -> K { Y.hc = K.cod; Y.hp = K.place; Y.ht = K.tipo } Y { J.cod = Y.sc; J.place = Y.sp; J.tipo = Y.st }
+Y -> * K { Y1.hp = criatemp(); T1.hc = Y.hc + K.cod + gen(*, Y1.hp, Y.hp, K.place);
+			Y1.ht = TableSymbol.CalcType(*, Y.ht, K.tipo) } Y1 { Y.sp = Y1.sp; Y.sc = Y1.sc; Y.st = Y1.st }
+Y -> / K { Y1.hp = criatemp(); T1.hc = Y.hc + K.cod + gen(/, Y1.hp, Y.hp, K.place);
+			Y1.ht = TableSymbol.CalcType(/, Y.ht, K.tipo) } Y1 { Y.sp = Y1.sp; Y.sc = Y1.sc; Y.st = Y1.st }
+Y -> % K { Y1.hp = criatemp(); T1.hc = Y.hc + K.cod + gen(%, Y1.hp, Y.hp, K.place);
+			Y1.ht = TableSymbol.CalcType(%, Y.ht, K.tipo) } Y1 { Y.sp = Y1.sp; Y.sc = Y1.sc; Y.st = Y1.st }
+Y -> Ɛ { Y.sp = Y.hp; Y.sc = Y.hc; Y.st = Y.ht }
 
 K ->
-	id { TableSymbol.ExistsVar(id.cod) } |
-	(Exp) |
-	int |
-	long |
+	id |       { K.place = id.cod; K.cod = ""; TableSymbol.Exists(id.cod); K.tipo = TableSymbol.getType(id.cod) }
+	(Exp) |    { K.place = Exp.place; K.cod = Exp.cod; K.tipo = Exp.tipo }
+	cteint |   { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "int" }
+	ctelong |  { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "long" }
+	ctefloat | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "float" }
+	cteboolean | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "boolean" } // em c nao existe, como tratar?
 	byte | //REMOVER
-	float |
-	Funcao
+    Funcao
 
 If ->
 	if ( Exp ) {{ ListaComandos }} IfEnd
@@ -150,5 +154,8 @@ SwitchDefault ->
 	default: {{ ListaComandos CaseEnd |
 	""
 
-
 // Separar blocos de comandos dos loops, if e funcao {}
+
+// Duvidas
+-Adicionar atribuicao com operadores reduzidos(+= *= ...) ???
+-Como fica exp de id = 1 || 2
