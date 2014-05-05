@@ -8,7 +8,20 @@ namespace CompiladorArduino
 {
     class TableSymbol
     {
-        private static TableSymbol instance = null;
+        private static TableSymbol _Instance { get; set; }
+        public static TableSymbol Instance
+        {
+            get
+            {
+                if (TableSymbol._Instance == null)
+                {
+                    TableSymbol._Instance = new TableSymbol();
+                }
+
+                return TableSymbol._Instance;
+            }
+        }
+
         private List<Symbol> TabelaSimbolos;
         
         public static String GlobalContext = "";
@@ -19,14 +32,6 @@ namespace CompiladorArduino
             this.TabelaSimbolos = new List<Symbol>();
         }
         
-        public static TableSymbol getInstance()
-        {
-            if(TableSymbol.instance == null){
-                TableSymbol.instance = new TableSymbol();
-            }
-            return TableSymbol.instance;
-        }
-
         public void Add(String id, int type)
         {
             this.Add(new Symbol(id, type));
@@ -87,7 +92,7 @@ namespace CompiladorArduino
         {
             if (!this.Exists(id))
             {
-                throw new AnalisadorException("Identificador não declarado.");
+                throw new AnalisadorException("Identificador não declarado."); //melhorar erro
             }
             return true;
         }
@@ -126,13 +131,17 @@ namespace CompiladorArduino
                 return LexMap.Consts["LOGICO"];
             }
 
-            if (t1 == LexMap.Consts["CONSTFLOAT"] || t2 == LexMap.Consts["CONSTFLOAT"])
+            if (t1 == LexMap.Consts["FLOAT"] || t2 == LexMap.Consts["FLOAT"])
             {
-                return LexMap.Consts["CONSTFLOAT"];
+                return LexMap.Consts["FLOAT"];
             }
-            else if (t1 == LexMap.Consts["CONSTINTEIRO"] || t2 == LexMap.Consts["CONSTINTEIRO"])
+            else if (t1 == LexMap.Consts["LONG"] || t2 == LexMap.Consts["LONG"])
             {
-                return LexMap.Consts["CONSTINTEIRO"];
+                return LexMap.Consts["LONG"];
+            }
+            else if (t1 == LexMap.Consts["INTEIRO"] || t2 == LexMap.Consts["INTEIRO"])
+            {
+                return LexMap.Consts["INTEIRO"];
             }
             return 0;
         }

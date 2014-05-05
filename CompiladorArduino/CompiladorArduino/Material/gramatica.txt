@@ -73,14 +73,20 @@ U -> Ɛ
 F -> G
 G -> !G
 
-G -> H V
-V -> > H V1
-V -> == H V1
-V -> < H V1
-V -> >= H V1
-V -> != H V1
-V -> <= H V1
-V -> Ɛ
+G -> H { V.hc = H.cod; V.hp = H.place; V.ht = H.tipo } V { G.cod = V.sc; G.place = V.sp; G.tipo = V.st }
+V -> > H { V1.hp = criatemp(); V1.hc = V.hc + H.cod + gen(>, V1.hp, V.hp, H.place);
+			V1.ht = TableSymbol.CalcType(>, V.ht, H.tipo) } V1 { V.sp = V1.sp; V.sc = V1.sc; V.st = V1.st }
+V -> == H { V1.hp = criatemp(); V1.hc = V.hc + H.cod + gen(==, V1.hp, V.hp, H.place);
+			V1.ht = TableSymbol.CalcType(==, V.ht, H.tipo) } V1 { V.sp = V1.sp; V.sc = V1.sc; V.st = V1.st }
+V -> < H { V1.hp = criatemp(); V1.hc = V.hc + H.cod + gen(<, V1.hp, V.hp, H.place);
+			V1.ht = TableSymbol.CalcType(<, V.ht, H.tipo) } V1 { V.sp = V1.sp; V.sc = V1.sc; V.st = V1.st }
+V -> >= H { V1.hp = criatemp(); V1.hc = V.hc + H.cod + gen(>=, V1.hp, V.hp, H.place);
+			V1.ht = TableSymbol.CalcType(>=, V.ht, H.tipo) } V1 { V.sp = V1.sp; V.sc = V1.sc; V.st = V1.st }
+V -> != H { V1.hp = criatemp(); V1.hc = V.hc + H.cod + gen(!=, V1.hp, V.hp, H.place);
+			V1.ht = TableSymbol.CalcType(!=, V.ht, H.tipo) } V1 { V.sp = V1.sp; V.sc = V1.sc; V.st = V1.st }
+V -> <= H { V1.hp = criatemp(); V1.hc = V.hc + H.cod + gen(<=, V1.hp, V.hp, H.place);
+			V1.ht = TableSymbol.CalcType(<=, V.ht, H.tipo) } V1 { V.sp = V1.sp; V.sc = V1.sc; V.st = V1.st }
+V -> Ɛ { V.sp = V.hp; V.sc = V.hc; V.st = V.ht }
 
 H -> J { X.hc = J.cod; X.hp = J.place; X.ht = J.tipo } X { H.cod = X.sc; H.place = X.sp; H.tipo = X.st }
 X -> + J { X1.hp = criatemp(); X1.hc = X.hc + J.cod + gen(+, X1.hp, X.hp, J.place); 
@@ -104,7 +110,7 @@ K ->
 	cteint |   { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "int" }
 	ctelong |  { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "long" }
 	ctefloat | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "float" }
-	cteboolean | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "boolean" } // em c nao existe, como tratar?
+	cteboolean | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "boolean" }
 	byte | //REMOVER
     Funcao
 
@@ -154,8 +160,11 @@ SwitchDefault ->
 	default: {{ ListaComandos CaseEnd |
 	""
 
+
 // Separar blocos de comandos dos loops, if e funcao {}
 
 // Duvidas
+-Como fazer verificacao de tipo na atribuicao?
 -Adicionar atribuicao com operadores reduzidos(+= *= ...) ???
 -Como fica exp de id = 1 || 2
+-boolean em c nao existe, como tratar?

@@ -24,7 +24,7 @@ namespace CompiladorArduino
                     sb.Append(item);
                 }
 
-                String ts = TableSymbol.getInstance().ToString();
+                String ts = TableSymbol.Instance.ToString();
 
                 if (debug)
                 {

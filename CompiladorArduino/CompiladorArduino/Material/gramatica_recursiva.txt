@@ -15,7 +15,7 @@ E -> { T.true = E.true; T.false = E.false } T { E.cod = T.cod; E.place = T.place
 T -> { T1.false = T.false; Lb = geralabel(); T1.true = Lb } T1 && { F.true = T.true; F.false = T.false } F { 
 		T.cod = T1.cod || gen(Lb, ':') || F.cod; T.tipo = TableSymbol.CalcType(&&, T1.tipo, F.tipo) }
 T -> { F.true = T.true; F.false = T.false } F { T.cod = F.cod; T.place = F.place; T.tipo = F.tipo }
-// falta goto LIni e LFim
+// falta goto LIni e LFim???????
 
 F -> { G.true = F.true; G.false = F.false } G { F.cod = G.cod; F.place = G.place; F.tipo = G.tipo }
 G -> ! { G1.false = G.true; G1.true = G.false } G1 { G.place = criatemp(); G.cod = G1.cod || gen(!, G.place, G1.place); G.tipo = G1.tipo }

@@ -1,8 +1,8 @@
 ﻿int i, j;
-float a;
+float a, b;
+long c;
 
-i = j + 1 * i;
-
+i = 6 + (5 - 7 * (5 / 8)) + 3;
 
 int end, fim;
 end = fim;
