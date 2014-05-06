@@ -176,7 +176,7 @@ void setup5() {
 int digitalRead(){}
 int constrain(){}
 int analogWrite(){}
-int sensorPin
+int sensorPin;
 void calibrate() {
   digitalWrite(indicatorLedPin, HIGH);
   sensorValue = analogRead(sensorPin);
@@ -198,6 +198,7 @@ void loop5() {
   analogWrite(ledPin, sensorValue);
 }
 
+int timer;
 timer = 100;
 int thisPin;
 void setup6() {

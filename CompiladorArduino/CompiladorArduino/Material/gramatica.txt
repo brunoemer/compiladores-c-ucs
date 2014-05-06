@@ -59,8 +59,16 @@ TipoVar ->
 	float | { TipoVar.tipo = "float" }
 	byte //REMOVER
 
+//Atribuicao -> 
+//	id { TableSymbol.ExistsVar(id.cod) } = Exp { Atribuicao.cod = Exp.cod + gen(=, id.cod, Exp.place) }
 Atribuicao -> 
-	id { TableSymbol.ExistsVar(id.cod) } = Exp { Atribuicao.cod = Exp.cod + gen(=, id.cod, Exp.place) }
+	id { TableSymbol.ExistsVar(id.cod); AtribOp.id = id.cod } AtribOp { Atribuicao.cod = AtribOp.cod +  }
+AtribOp ->
+	= Exp | { Atribuicao.cod = Exp.cod + gen(=, AtribOp.cod, Exp.place) }
+	+= Exp | 
+	-= Exp | 
+	*= Exp | 
+	/= Exp
 
 Exp -> T R
 R -> || T R1
@@ -165,6 +173,8 @@ SwitchDefault ->
 
 // Duvidas
 -Como fazer verificacao de tipo na atribuicao? float pode ser atribuido para int
--Adicionar atribuicao com operadores reduzidos(+= *= ...), fazer
--Como fica exp de id = 1 || 2, tratar como int
+-Adicionar atribuicao com operadores reduzidos(+= *= ...)? fazer
+-Como fica exp de id = 1 || 2 ? tratar como int
 -boolean em c nao existe, como tratar?
+-como fica operadores ! ?
+-goto no && e ||

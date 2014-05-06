@@ -479,6 +479,30 @@ namespace CompiladorArduino
 
         #endregion Declaracao
 
+        public void Atribuicao(out String AtribCod)
+        {
+            AtribCod = "";
+            String id = TokenManager.Instance.TokenSymbol;
+            int idType = TableSymbol.Instance.GetType(id);
+            TableSymbol.Instance.ExistsVar(id);
+
+            AnalisadorLexico.Analisar();
+            String ExpCod, ExpPlace;
+            int ExpTipo;
+            if (TokenManager.Instance.TokenCode == LexMap.Consts["ATRIBUICAO"])
+            {
+                this.Exp(out ExpCod, out ExpPlace, out ExpTipo);
+
+                //if (idType != ExpTipo) // como fazer?
+                //{
+                //throw new AnalisadorException("Atribuição com tipo incompatível."); //melhorar erro
+                //}
+
+                AtribCod = ExpCod + id + " = " + ExpPlace + Environment.NewLine;
+            }
+
+        }
+
         #region Expressao
 
         public void Exp(out String ECod, out String EPlace, out int ETipo)
@@ -908,30 +932,6 @@ namespace CompiladorArduino
         }
 
         #endregion Expressao
-
-        public void Atribuicao(out String AtribCod)
-        {
-            AtribCod = "";
-            String id = TokenManager.Instance.TokenSymbol;
-            int idType = TableSymbol.Instance.GetType(id);
-            TableSymbol.Instance.ExistsVar(id);
-
-            AnalisadorLexico.Analisar();
-            String ExpCod, ExpPlace;
-            int ExpTipo;
-            if (TokenManager.Instance.TokenCode == LexMap.Consts["ATRIBUICAO"])
-            {
-                this.Exp(out ExpCod, out ExpPlace, out ExpTipo);
-
-                //if (idType != ExpTipo) // como fazer?
-                //{
-                    //throw new AnalisadorException("Atribuição com tipo incompatível."); //melhorar erro
-                //}
-
-                AtribCod = ExpCod + id + " = " + ExpPlace + Environment.NewLine;
-            }
-
-        }
 
         private void If()
         {
