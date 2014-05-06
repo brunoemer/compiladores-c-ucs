@@ -607,12 +607,11 @@ namespace CompiladorArduino
             AnalisadorLexico.Analisar();
             if (TokenManager.Instance.TokenCode == LexMap.Consts["NAO"])
             {
-                //ver se esta certo
                 String G1Cod, G1Place;
                 int G1Tipo;
                 this.ExpG(out G1Cod, out G1Place, out G1Tipo);
                 GPlace = this.CriaTemp();
-                GCod = G1Cod + GPlace + " = !" + G1Place;
+                GCod = G1Cod + GPlace + " = !" + G1Place + Environment.NewLine;
                 GTipo = G1Tipo;
             }
             else

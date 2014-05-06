@@ -164,7 +164,7 @@ SwitchDefault ->
 // Separar blocos de comandos dos loops, if e funcao {}
 
 // Duvidas
--Como fazer verificacao de tipo na atribuicao?
--Adicionar atribuicao com operadores reduzidos(+= *= ...) ???
--Como fica exp de id = 1 || 2
+-Como fazer verificacao de tipo na atribuicao? float pode ser atribuido para int
+-Adicionar atribuicao com operadores reduzidos(+= *= ...), fazer
+-Como fica exp de id = 1 || 2, tratar como int
 -boolean em c nao existe, como tratar?

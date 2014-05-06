@@ -8,7 +8,7 @@ j = .5;
 
 i = 6 + 7 + (5 - 7 * (5 / 8));
 
-j = a || b > 8 < 7 <= 9.5 >= .09 || (!x) != 4 && (k == 2 && (!dfsad));
+j = a || b > 8 < 7 <= 9.5 >= .09 || (!x) != 4 && (k == 2 && (!abd));
 
 int aloca;
 
@@ -55,7 +55,7 @@ a = 8;
 int xxx(int a, int x){ }
 
 void testefuncao(float kgb, byte carro){
-	int a, b, c;
+	int a, b, c, k;
 	if(1){
 		a = 5;
 	}
@@ -65,10 +65,12 @@ void testefuncao(float kgb, byte carro){
 
 testefuncao(1);
 
+void teste2(){}
+
 teste2(3, (4 + 2), a);
 
-int testefuncao(){
-	teste2(x);
+int teste(){
+	
 }
 
 a = teste();
@@ -80,66 +82,53 @@ teste();
 void function(){
 }
 
+void begin(){}
+void pinMode(){}
+
 int buttonPin;
 void setup()
 {
   begin(9600);
   pinMode(buttonPin, INPUT);
 }
-void loop()
-{
-  
-}
 
-switch(1){
-	case 1:{a=1;} break;
-	case 2:{} break;
-	default : {a=2;} break;
-}
+int analogRead(){}
+int delay(){}
+int map(){}
 
 int sensorMin;
 int sensorMax;
-void setup() {
-  begin(9600);
-}
 void loop() {
-  sensorReading = analogRead(A0);
+  int sensorReading;
+  int range;
+  sensorReading = analogRead(0);
   range = map(sensorReading, sensorMin, sensorMax, 0, 3);
-  switch (range) {
-	  case 0:{
-		println();}
-		break;
-	  case 1:{
-		println();}
-		break;
-	  case 2:{
-		println();}
-		break;
-	  case 3:{
-		println();}
-		break;
-  }
+  
   delay(1);
 }
 
+int digitalWrite(){}
+int led;
 led = 13;
-void setup() {
+void setup2() {
   pinMode(led, OUTPUT);
 }
-void loop() {
+void loop2() {
   digitalWrite(led, HIGH);
   delay(1000);
   digitalWrite(led, LOW);
   delay(1000);
 }
 
+int Serial(){}
+int ledPin;
 ledPin = 13;
 int incomingByte;
-void setup() {
+void setup3() {
   Serial.begin(9600);
   pinMode(ledPin, OUTPUT);
 }
-void loop() {
+void loop3() {
   if (Serial.available() > 0) {
     incomingByte = Serial.read();
     if (incomingByte == 1) {
@@ -151,14 +140,17 @@ void loop() {
   }
 }
 
-analogPin = A0;
+int analogPin;
+analogPin = 0;
 ledPin = 13;
+int threshold;
 threshold = 400;
-void setup() {
+void setup4() {
   pinMode(ledPin, OUTPUT);
   Serial.begin(9600);
 }
-void loop() {
+void loop4() {
+  int analogValue;
   analogValue = analogRead(analogPin);
   if (analogValue > threshold) {
     digitalWrite(ledPin, HIGH);
@@ -170,24 +162,21 @@ void loop() {
   delay(1);
 }
 
+int indicatorLedPin;
 sensorMin = 1023;
 sensorMax = 0;
+int sensorValue;
 sensorValue = 0;
-void setup() {
+void setup5() {
+  int indicatorLedPin;
   pinMode(indicatorLedPin, OUTPUT);
   pinMode (ledPin, OUTPUT);
   pinMode (buttonPin, INPUT);
 }
-void loop() {
-  while (digitalRead(buttonPin) == HIGH) {
-    calibrate();
-  }
-  digitalWrite(indicatorLedPin, LOW);
-  sensorValue = analogRead(sensorPin);
-  sensorValue = map(sensorValue, sensorMin, sensorMax, 0, 255);
-  sensorValue = constrain(sensorValue, 0, 255);
-  analogWrite(ledPin, sensorValue);
-}
+int digitalRead(){}
+int constrain(){}
+int analogWrite(){}
+int sensorPin
 void calibrate() {
   digitalWrite(indicatorLedPin, HIGH);
   sensorValue = analogRead(sensorPin);
@@ -198,14 +187,25 @@ void calibrate() {
     sensorMin = sensorValue;
   }
 }
+void loop5() {
+  while (digitalRead(buttonPin) == HIGH) {
+    calibrate();
+  }
+  digitalWrite(indicatorLedPin, LOW);
+  sensorValue = analogRead(sensorPin);
+  sensorValue = map(sensorValue, sensorMin, sensorMax, 0, 255);
+  sensorValue = constrain(sensorValue, 0, 255);
+  analogWrite(ledPin, sensorValue);
+}
 
 timer = 100;
-void setup() {
+int thisPin;
+void setup6() {
   for (thisPin = 2; thisPin < 8; thisPin=thisPin + 1)  {
     pinMode(thisPin, OUTPUT);
   }
 }
-void loop() {
+void loop6() {
   for (thisPin = 2; thisPin < 8; thisPin=thisPin + 1) {
     digitalWrite(thisPin, HIGH);
     delay(timer);
@@ -220,4 +220,5 @@ void loop() {
 
 x = 1+2+3-4-5+6*7/9%(4.566e-12);
 
+int end, fim;
 end = fim;     

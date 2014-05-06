@@ -49,19 +49,26 @@ namespace CompiladorArduino
 
         public void Add(Symbol s)
         {
-            if (this.Exists(s.id))
+            if (this.GetSymbol(s.id, 0) != null)
             {
-                throw new AnalisadorException("Identificador já declarado.");
+                throw new AnalisadorException("Identificador " + s.id + " já declarado.");
             }
             this.TabelaSimbolos.Add(s);
         }
 
         public Symbol GetSymbol(String id)
         {
+            return this.GetSymbol(id, 1);
+        }
+
+        public Symbol GetSymbol(String id, int global)
+        {
             foreach (Symbol s in this.TabelaSimbolos)
             {
                 if (s.id.Equals(id) && s.context.Equals(CurrentContext))
                 {
+                    return s;
+                }else if(global == 1 && s.id.Equals(id) && s.context.Equals(GlobalContext)){
                     return s;
                 }
             }
@@ -92,7 +99,7 @@ namespace CompiladorArduino
         {
             if (!this.Exists(id))
             {
-                throw new AnalisadorException("Identificador não declarado."); //melhorar erro
+                throw new AnalisadorException("Identificador " + id + " não declarado."); //melhorar erro
             }
             return true;
         }
@@ -102,7 +109,7 @@ namespace CompiladorArduino
             bool hasFunc = false;
             foreach (Symbol s in this.TabelaSimbolos)
             {
-                if (s.id.Equals(id) && s.context.Equals(CurrentContext) && s.sType == StructureType.Function)
+                if (s.id.Equals(id) && s.sType == StructureType.Function)
                 {
                     hasFunc = true;
                     break;

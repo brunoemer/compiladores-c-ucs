@@ -3,6 +3,8 @@ float a, b;
 long c;
 
 i = 6 + (5 - 7 * (5 / 8)) + 3;
+j = !a > b - 1 * 5;
+c = i && 1;
 
 int end, fim;
 end = fim;
