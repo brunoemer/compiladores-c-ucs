@@ -64,7 +64,7 @@ TipoVar ->
 Atribuicao -> 
 	id { TableSymbol.ExistsVar(id.cod); AtribOp.id = id.cod } AtribOp { Atribuicao.cod = AtribOp.cod +  }
 AtribOp ->
-	= Exp | { Atribuicao.cod = Exp.cod + gen(=, AtribOp.cod, Exp.place) }
+	= Exp  | { Atribuicao.cod = Exp.cod + gen(=, AtribOp.cod, Exp.place) }
 	+= Exp | 
 	-= Exp | 
 	*= Exp | 

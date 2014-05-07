@@ -547,9 +547,9 @@ namespace CompiladorArduino
                 String R1sc, R1sp;
                 int R1st;
                 this.ExpR(R1hc, R1hp, R1ht, out R1sc, out R1sp, out R1st);
-                Rsc = R1hc;
-                Rsp = R1hp;
-                Rst = R1ht;
+                Rsc = R1sc;
+                Rsp = R1sp;
+                Rst = R1st;
             }
             else
             {
@@ -603,9 +603,9 @@ namespace CompiladorArduino
                 String U1sc, U1sp;
                 int U1st;
                 this.ExpU(U1hc, U1hp, U1ht, out U1sc, out U1sp, out U1st);
-                Usc = U1hc;
-                Usp = U1hp;
-                Ust = U1ht;
+                Usc = U1sc;
+                Usp = U1sp;
+                Ust = U1st;
             }
             else
             {
@@ -709,9 +709,9 @@ namespace CompiladorArduino
                 String V1sc, V1sp;
                 int V1st;
                 this.ExpV(V1hc, V1hp, V1ht, out V1sc, out V1sp, out V1st);
-                Vsc = V1hc;
-                Vsp = V1hp;
-                Vst = V1ht;
+                Vsc = V1sc;
+                Vsp = V1sp;
+                Vst = V1st;
             }
             else
             {
@@ -788,9 +788,9 @@ namespace CompiladorArduino
                 String X1sc, X1sp;
                 int X1st;
                 this.ExpX(X1hc, X1hp, X1ht, out X1sc, out X1sp, out X1st);
-                Xsc = X1hc;
-                Xsp = X1hp;
-                Xst = X1ht;
+                Xsc = X1sc;
+                Xsp = X1sp;
+                Xst = X1st;
             }
             else
             {
@@ -834,9 +834,9 @@ namespace CompiladorArduino
                 String Y1sc, Y1sp;
                 int Y1st;
                 this.ExpY(Y1hc, Y1hp, Y1ht, out Y1sc, out Y1sp, out Y1st);
-                Ysc = Y1hc;
-                Ysp = Y1hp;
-                Yst = Y1ht;
+                Ysc = Y1sc;
+                Ysp = Y1sp;
+                Yst = Y1st;
             }
             else
             {
