@@ -62,13 +62,17 @@ TipoVar ->
 //Atribuicao -> 
 //	id { TableSymbol.ExistsVar(id.cod) } = Exp { Atribuicao.cod = Exp.cod + gen(=, id.cod, Exp.place) }
 Atribuicao -> 
-	id { TableSymbol.ExistsVar(id.cod); AtribOp.id = id.cod } AtribOp { Atribuicao.cod = AtribOp.cod +  }
+	id { TableSymbol.ExistsVar(id.cod); AtribOp.id = id.cod } AtribOp { Atribuicao.cod = AtribOp.cod }
 AtribOp ->
-	= Exp  | { Atribuicao.cod = Exp.cod + gen(=, AtribOp.cod, Exp.place) }
-	+= Exp | 
-	-= Exp | 
-	*= Exp | 
-	/= Exp
+	= Exp  | { AtribOp.cod = Exp.cod + gen(=, AtribOp.id, Exp.place) }
+	+= Exp | { AtribOp.place = criatemp(); AtribOp.cod = Exp.cod + 
+				gen(+, AtribOp.place, AtribOp.id, Exp.place) + gen(=, AtribOp.id, AtribOp.place) }
+	-= Exp | { AtribOp.place = criatemp(); AtribOp.cod = Exp.cod + 
+				gen(-, AtribOp.place, AtribOp.id, Exp.place) + gen(=, AtribOp.id, AtribOp.place) }
+	*= Exp | { AtribOp.place = criatemp(); AtribOp.cod = Exp.cod + 
+				gen(*, AtribOp.place, AtribOp.id, Exp.place) + gen(=, AtribOp.id, AtribOp.place) }
+	/= Exp   { AtribOp.place = criatemp(); AtribOp.cod = Exp.cod + 
+				gen(/, AtribOp.place, AtribOp.id, Exp.place) + gen(=, AtribOp.id, AtribOp.place) }
 
 Exp -> T R
 R -> || T R1

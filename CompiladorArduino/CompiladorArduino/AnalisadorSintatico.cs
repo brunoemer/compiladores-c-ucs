@@ -486,21 +486,60 @@ namespace CompiladorArduino
             int idType = TableSymbol.Instance.GetType(id);
             TableSymbol.Instance.ExistsVar(id);
 
-            AnalisadorLexico.Analisar();
-            String ExpCod, ExpPlace;
-            int ExpTipo;
-            if (TokenManager.Instance.TokenCode == LexMap.Consts["ATRIBUICAO"])
-            {
-                this.Exp(out ExpCod, out ExpPlace, out ExpTipo);
+            String AtribOpCod;
+            this.AtribOp(id, out AtribOpCod);
+            AtribCod = AtribOpCod;
+
+            //AnalisadorLexico.Analisar();
+            //String ExpCod, ExpPlace;
+            //int ExpTipo;
+            //if (TokenManager.Instance.TokenCode == LexMap.Consts["ATRIBUICAO"])
+            //{
+            //    this.Exp(out ExpCod, out ExpPlace, out ExpTipo);
 
                 //if (idType != ExpTipo) // como fazer?
                 //{
                 //throw new AnalisadorException("Atribuição com tipo incompatível."); //melhorar erro
                 //}
 
-                AtribCod = ExpCod + id + " = " + ExpPlace + Environment.NewLine;
+            //    AtribCod = ExpCod + id + " = " + ExpPlace + Environment.NewLine;
+            //}
+
+        }
+
+        public void AtribOp(String AtribOpId, out String AtribOpCod)
+        {
+            AtribOpCod = "";
+            AnalisadorLexico.Analisar();
+            String ExpCod, ExpPlace;
+            int ExpTipo;
+            if (TokenManager.Instance.TokenCode == LexMap.Consts["ATRIBUICAO"])
+            {
+                this.Exp(out ExpCod, out ExpPlace, out ExpTipo);
+                AtribOpCod = ExpCod + AtribOpId + " = " + ExpPlace + Environment.NewLine;
+            }
+            else if (TokenManager.Instance.TokenCode == LexMap.Consts["MAIS"] ||
+                TokenManager.Instance.TokenCode == LexMap.Consts["MENOS"] ||
+                TokenManager.Instance.TokenCode == LexMap.Consts["MULTIPLICACAO"] ||
+                TokenManager.Instance.TokenCode == LexMap.Consts["DIVISAO"])
+            {
+                String tks = TokenManager.Instance.TokenSymbol;
+                AnalisadorLexico.Analisar();
+                if (TokenManager.Instance.TokenCode != LexMap.Consts["ATRIBUICAO"])
+                {
+                    throw new AnalisadorException("O token = era esperado");
+                }
+                this.Exp(out ExpCod, out ExpPlace, out ExpTipo);
+                String AtribOpPlace = this.CriaTemp();
+                AtribOpCod = ExpCod;
+                AtribOpCod += AtribOpPlace + " = " + AtribOpId + " " + tks + " " + ExpPlace + Environment.NewLine;
+                AtribOpCod += AtribOpId + " = " + AtribOpPlace + Environment.NewLine;
             }
 
+            //if (idType != ExpTipo) // como fazer?
+            //{
+            //throw new AnalisadorException("Atribuição com tipo incompatível."); //melhorar erro
+            //}
         }
 
         #region Expressao

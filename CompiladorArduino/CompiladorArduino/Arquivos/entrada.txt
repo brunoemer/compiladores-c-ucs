@@ -2,5 +2,9 @@
 float a, b;
 long c;
 
+i /= j + 1;
+j -= i - (2 * i);
 i = 1 + 2 - (5 - 7 * (5 / 8)) + 3;
 
+int end, fim;
+end = fim;
