@@ -8,19 +8,21 @@ IfEnd ->
 Atribuicao -> 
 	id = E { Atribuicao.cod = E.cod + gen(=, id.cod, E.place) }
 
-E -> { E1.true = E.true; Lb = geralabel(); E1.false = Lb } E1 || { T.true = E.true; T.false = E.false } T {
+E -> { E1.true = E.true; Lb = geralabel(); E1.false = Lb } E1 {gen(if E1.place != 0 goto E1.true)????} || { T.true = E.true; T.false = E.false } T {
 		E.cod = E1.cod || gen(Lb, ':') || T.cod; E.tipo = TableSymbol.CalcType(||, E1.tipo, T.tipo) }
 E -> { T.true = E.true; T.false = E.false } T { E.cod = T.cod; E.place = T.place; E.tipo = T.tipo }
 
 T -> { T1.false = T.false; Lb = geralabel(); T1.true = Lb } T1 && { F.true = T.true; F.false = T.false } F { 
 		T.cod = T1.cod || gen(Lb, ':') || F.cod; T.tipo = TableSymbol.CalcType(&&, T1.tipo, F.tipo) }
 T -> { F.true = T.true; F.false = T.false } F { T.cod = F.cod; T.place = F.place; T.tipo = F.tipo }
-// falta goto LIni e LFim? e como fica id = 1 || 2 ?
 
 F -> { G.true = F.true; G.false = F.false } G { F.cod = G.cod; F.place = G.place; F.tipo = G.tipo }
 G -> ! { G1.false = G.true; G1.true = G.false } G1 { G.place = criatemp(); G.cod = G1.cod || gen(!, G.place, G1.place); G.tipo = G1.tipo }
 
-G -> G1 > H  { G.place = criatemp(); G.cod = G1.cod || H.cod || gen(>, G.place, G1.place, H.place); G.tipo = TableSymbol.CalcType(>, G1.tipo, H.tipo) }
+G -> G1 > H  { G.place = criatemp(); 
+	G.cod = G1.cod || H.cod || gen(>, G.place, G1.place, H.place) 
+		|| gen("if", G.place, "!= 0 goto", G.true) || gen("goto", E.false)???; 
+	G.tipo = TableSymbol.CalcType(>, G1.tipo, H.tipo) }
 G -> G1 == H { G.place = criatemp(); G.cod = G1.cod || H.cod || gen(==, G.place, G1.place, H.place); G.tipo = TableSymbol.CalcType(==, G1.tipo, H.tipo) }
 G -> G1 < H  { G.place = criatemp(); G.cod = G1.cod || H.cod || gen(<, G.place, G1.place, H.place); G.tipo = TableSymbol.CalcType(<, G1.tipo, H.tipo) }
 G -> G1 >= H { G.place = criatemp(); G.cod = G1.cod || H.cod || gen(>=, G.place, G1.place, H.place); G.tipo = TableSymbol.CalcType(>=, G1.tipo, H.tipo) }
@@ -43,6 +45,10 @@ K ->
 	cteint |   { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "int" }
 	ctelong |  { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "long" }
 	ctefloat | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "float" }
-	cteboolean | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "boolean" } // em c nao existe, como tratar?
+	cteboolean | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "boolean";
+				if (K.true != null) {
+					if (cte.val == true) K.cod = gen("goto", K.true); else K.cod = gen("goto", K.false);
+				}
+			}
 	Funcao
 
