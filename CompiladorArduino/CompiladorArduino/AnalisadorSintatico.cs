@@ -42,8 +42,9 @@ namespace CompiladorArduino
             //declaração variaveis
             if (TokenManager.Instance.TokenCode == LexMap.Consts["INTEIRO"] ||
                 TokenManager.Instance.TokenCode == LexMap.Consts["FLOAT"] ||
-                TokenManager.Instance.TokenCode == LexMap.Consts["BYTE"] ||
                 TokenManager.Instance.TokenCode == LexMap.Consts["LONG"] ||
+                TokenManager.Instance.TokenCode == LexMap.Consts["LOGICO"] ||
+                TokenManager.Instance.TokenCode == LexMap.Consts["BYTE"] ||
                 TokenManager.Instance.TokenCode == LexMap.Consts["VOID"])
             {
                 LineManager.Instance.ResetToLastPos();
@@ -134,6 +135,7 @@ namespace CompiladorArduino
             //declaração variaveis
             if (TokenManager.Instance.TokenCode == LexMap.Consts["INTEIRO"] ||
                 TokenManager.Instance.TokenCode == LexMap.Consts["FLOAT"] ||
+                TokenManager.Instance.TokenCode == LexMap.Consts["LOGICO"] ||
                 TokenManager.Instance.TokenCode == LexMap.Consts["BYTE"] ||
                 TokenManager.Instance.TokenCode == LexMap.Consts["LONG"])
             {
@@ -447,6 +449,7 @@ namespace CompiladorArduino
 
             if (TokenManager.Instance.TokenCode != LexMap.Consts["INTEIRO"] &&
                 TokenManager.Instance.TokenCode != LexMap.Consts["FLOAT"] &&
+                TokenManager.Instance.TokenCode != LexMap.Consts["LOGICO"] &&
                 TokenManager.Instance.TokenCode != LexMap.Consts["BYTE"] &&
                 TokenManager.Instance.TokenCode != LexMap.Consts["LONG"])
             {
@@ -483,7 +486,6 @@ namespace CompiladorArduino
         {
             AtribCod = "";
             String id = TokenManager.Instance.TokenSymbol;
-            int idType = TableSymbol.Instance.GetType(id);
             TableSymbol.Instance.ExistsVar(id);
 
             String AtribOpCod;
@@ -497,7 +499,7 @@ namespace CompiladorArduino
             AtribOpCod = "";
             AnalisadorLexico.Analisar();
             String ExpCod, ExpPlace;
-            int ExpTipo;
+            int ExpTipo = 0;
             if (TokenManager.Instance.TokenCode == LexMap.Consts["ATRIBUICAO"])
             {
                 this.Exp(out ExpCod, out ExpPlace, out ExpTipo);
@@ -521,10 +523,18 @@ namespace CompiladorArduino
                 AtribOpCod += AtribOpId + " = " + AtribOpPlace + Environment.NewLine;
             }
 
-            //if (idType != ExpTipo) // como fazer?
-            //{
-            //throw new AnalisadorException("Atribuição com tipo incompatível."); //melhorar erro
-            //}
+            int tInt = LexMap.Consts["INTEIRO"];
+            int tFloat = LexMap.Consts["FLOAT"];
+            int tLog = LexMap.Consts["LOGICO"];
+            int idType = TableSymbol.Instance.GetType(AtribOpId);
+            if (idType == tLog && ExpTipo != tLog ||
+                idType == tInt && ExpTipo == tLog ||
+                idType == tFloat && ExpTipo == tLog)
+            {
+                throw new AnalisadorException("Atribuição com tipo incompatível: " + 
+                    LexMap.TokenGetNome(idType) + " = " + LexMap.TokenGetNome(ExpTipo));
+            }
+
         }
 
         #region Expressao
@@ -1032,6 +1042,8 @@ namespace CompiladorArduino
             }
         }
 
+        #region loops
+
         private void While()
         {
             if (TokenManager.Instance.TokenCode == LexMap.Consts["WHILE"])
@@ -1193,7 +1205,9 @@ namespace CompiladorArduino
             }
         }
 
-/*
+        #endregion loops
+
+        /*
         private void Switch()
         {
             if (TokenManager.Instance.TokenCode == LexMap.Consts["SWITCH"])

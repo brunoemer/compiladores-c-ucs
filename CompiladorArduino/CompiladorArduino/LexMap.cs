@@ -80,6 +80,7 @@ namespace CompiladorArduino
             {"float", 46},
             {"long", 49},
             {"byte", 50},
+            {"bool", 51},
             {"void", 58},
             {"switch", 84},
             {"case", 85},

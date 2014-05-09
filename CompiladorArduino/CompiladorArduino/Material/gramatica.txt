@@ -57,6 +57,7 @@ TipoVar ->
 	int | { TipoVar.tipo = "int" }
 	long | { TipoVar.tipo = "long" }
 	float | { TipoVar.tipo = "float" }
+	bool | { TipoVar.tipo = "bool" }
 	byte //REMOVER
 
 Atribuicao -> 
@@ -120,7 +121,7 @@ K ->
 	cteint |   { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "int" }
 	ctelong |  { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "long" }
 	ctefloat | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "float" }
-	cteboolean | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "boolean" }
+	ctebool | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "bool" }
 	byte | //REMOVER
     Funcao
 
