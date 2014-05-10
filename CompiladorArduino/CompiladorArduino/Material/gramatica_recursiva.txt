@@ -22,7 +22,7 @@ G -> ! { G1.false = G.true; G1.true = G.false } G1 { G.place = criatemp(); G.cod
 
 G -> G1 > H  { G.place = criatemp(); 
 	G.cod = G1.cod || H.cod || gen(>, G.place, G1.place, H.place) 
-		|| gen("if", G.place, "!= 0 goto", G.true) || gen("goto", E.false)????; 
+		|| gen("if", G.place, "!= 0 goto", G.true) || gen("goto", G.false)????; 
 	G.tipo = TableSymbol.CalcType(>, G1.tipo, H.tipo) }
 G -> G1 == H { G.place = criatemp(); G.cod = G1.cod || H.cod || gen(==, G.place, G1.place, H.place); G.tipo = TableSymbol.CalcType(==, G1.tipo, H.tipo) }
 G -> G1 < H  { G.place = criatemp(); G.cod = G1.cod || H.cod || gen(<, G.place, G1.place, H.place); G.tipo = TableSymbol.CalcType(<, G1.tipo, H.tipo) }
@@ -35,7 +35,7 @@ H -> H1 + J { H.place = criatemp(); H.cod = H1.cod || J.cod || gen(+, H.place, H
 H -> H1 - J { H.place = criatemp(); H.cod = H1.cod || J.cod || gen(-, H.place, H1.place, J.place); H.tipo = TableSymbol.CalcType(-, H1.tipo, J.tipo) }
 H -> J { H.cod = J.cod; H.place = J.place; H.tipo = J.tipo }
 
-J -> {J1.true=J.true;K.true=J.true????} J1 * K { J.place = criatemp(); J.cod = J1.cod || K.cod || gen(*, J.place, J1.place, K.place); J.tipo = TableSymbol.CalcType(*, J1.tipo, K.tipo) }
+J -> {J1.true=J.true;K.true=J.true????nao precisa?} J1 * K { J.place = criatemp(); J.cod = J1.cod || K.cod || gen(*, J.place, J1.place, K.place); J.tipo = TableSymbol.CalcType(*, J1.tipo, K.tipo) }
 J -> J1 / K { J.place = criatemp(); J.cod = J1.cod || K.cod || gen(/, J.place, J1.place, K.place); J.tipo = TableSymbol.CalcType(/, J1.tipo, K.tipo) }
 J -> J1 % K { J.place = criatemp(); J.cod = J1.cod || K.cod || gen(%, J.place, J1.place, K.place); J.tipo = TableSymbol.CalcType(%, J1.tipo, K.tipo) }
 J -> {K.true = J.true; K.false = J.false????} K { J.cod = K.cod; J.place = K.place; J.tipo = K.tipo }
@@ -46,7 +46,7 @@ K ->
 	cteint |   { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "int" }
 	ctelong |  { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "long" }
 	ctefloat | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "float" }
-	ctebool | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "bool";
+	ctebool |  { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "bool";
 				if (K.true != null) {
 					if (cte.val == true) K.cod = gen("goto", K.true); else K.cod = gen("goto", K.false);
 				}????

@@ -562,6 +562,7 @@ namespace CompiladorArduino
             //falta fazer restante
             AnalisadorLexico.Analisar();
             Int32 opType = TokenManager.Instance.TokenCode;
+            String opTk = TokenManager.Instance.TokenSymbol;
             bool is_valid_flag = false;
 
             if (opType == LexMap.Consts["OU"])
@@ -575,7 +576,7 @@ namespace CompiladorArduino
                 int TTipo, R1ht;
                 this.ExpT(out TCod, out TPlace, out TTipo);
                 R1hp = this.CriaTemp();
-                R1hc = Rhc + TCod; //falta operacao
+                R1hc = Rhc + TCod + R1hp + " = " + Rhp + " " + opTk + " " + TPlace + Environment.NewLine; //falta operacao
                 R1ht = TableSymbol.Instance.CalcType(opType, Rht, TTipo);
 
                 String R1sc, R1sp;
@@ -618,6 +619,7 @@ namespace CompiladorArduino
             //falta fazer restante
             AnalisadorLexico.Analisar();
             Int32 opType = TokenManager.Instance.TokenCode;
+            String opTk = TokenManager.Instance.TokenSymbol;
             bool is_valid_flag = false;
 
             if (opType == LexMap.Consts["E"])
@@ -631,7 +633,7 @@ namespace CompiladorArduino
                 int FTipo, U1ht;
                 this.ExpF(out FCod, out FPlace, out FTipo);
                 U1hp = this.CriaTemp();
-                U1hc = Uhc + FCod; //falta operacao
+                U1hc = Uhc + FCod + U1hp + " = " + Uhp + " " + opTk + " " + FPlace + Environment.NewLine; //falta operacao
                 U1ht = TableSymbol.Instance.CalcType(opType, Uht, FTipo);
 
                 String U1sc, U1sp;
