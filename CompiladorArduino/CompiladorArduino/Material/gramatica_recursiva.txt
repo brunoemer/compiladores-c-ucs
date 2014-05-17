@@ -9,12 +9,15 @@ Atribuicao ->
 	id = E { Atribuicao.cod = E.cod + gen(=, id.cod, E.place) }
 
 E -> { E1.true = E.true; Lb = geralabel(); E1.false = Lb } E1 || { T.true = E.true; T.false = E.false } T {
-		if(E.true != null){ E.cod = E1.cod || gen(Lb, ':') || T.cod; }else{ E.place = criatemp(); E.cod = E1.cod || T.cod || gen(||, E.place, E1.place, T.place); }
+		if(E.true != null){ E.cod = E1.cod || gen(Lb, ':') || T.cod; }
+		else{ E.place = criatemp(); E.cod = E1.cod || T.cod || gen(||, E.place, E1.place, T.place); }
 		E.tipo = TableSymbol.CalcType(||, E1.tipo, T.tipo) }
 E -> { T.true = E.true; T.false = E.false } T { E.cod = T.cod; E.place = T.place; E.tipo = T.tipo }
 
 T -> { T1.false = T.false; Lb = geralabel(); T1.true = Lb } T1 && { F.true = T.true; F.false = T.false } F { 
-		T.cod = T1.cod || gen(Lb, ':') || F.cod; T.tipo = TableSymbol.CalcType(&&, T1.tipo, F.tipo) }
+		if(T.true != null){ T.cod = T1.cod || gen(Lb, ':') || F.cod; }
+		else{ T.place = criatemp(); T.cod = T1.cod || F.cod || gen(&&, T.place, T1.place, F.place); }
+		T.tipo = TableSymbol.CalcType(&&, T1.tipo, F.tipo) }
 T -> { F.true = T.true; F.false = T.false } F { T.cod = F.cod; T.place = F.place; T.tipo = F.tipo }
 
 F -> { G.true = F.true; G.false = F.false } G { F.cod = G.cod; F.place = G.place; F.tipo = G.tipo }
