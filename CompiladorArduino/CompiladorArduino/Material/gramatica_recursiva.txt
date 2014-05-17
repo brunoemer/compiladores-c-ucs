@@ -9,7 +9,8 @@ Atribuicao ->
 	id = E { Atribuicao.cod = E.cod + gen(=, id.cod, E.place) }
 
 E -> { E1.true = E.true; Lb = geralabel(); E1.false = Lb } E1 || { T.true = E.true; T.false = E.false } T {
-		E.cod = E1.cod || gen(Lb, ':') || T.cod; E.tipo = TableSymbol.CalcType(||, E1.tipo, T.tipo) }
+		if(E.true != null){ E.cod = E1.cod || gen(Lb, ':') || T.cod; }else{ E.place = criatemp(); E.cod = E1.cod || T.cod || gen(||, E.place, E1.place, T.place); }
+		E.tipo = TableSymbol.CalcType(||, E1.tipo, T.tipo) }
 E -> { T.true = E.true; T.false = E.false } T { E.cod = T.cod; E.place = T.place; E.tipo = T.tipo }
 
 T -> { T1.false = T.false; Lb = geralabel(); T1.true = Lb } T1 && { F.true = T.true; F.false = T.false } F { 
@@ -54,24 +55,16 @@ J -> { K.true = J.true; K.false = J.false } K { J.cod = K.cod; J.place = K.place
 
 K ->
 	id |    { K.place = id.cod; K.cod = ""; TableSymbol.Exists(id.cod); K.tipo = TableSymbol.getType(id.cod);
-				if(K.tipo == "bool"){
-					K.cod = gen("if", K.place, "== true goto", K.true) || gen("goto", K.false);
-				}
-			}
-	(E) |   { K.place = E.place; K.cod = E.cod; K.tipo = E.tipo 
-				E.true = K.true; E.false = K.false;
-			}
+				if(K.tipo == "bool") K.cod = gen("if", K.place, "== true goto", K.true) || gen("goto", K.false); }
+	(E) |   { K.place = E.place; K.cod = E.cod; K.tipo = E.tipo; 
+				E.true = K.true; E.false = K.false; }
 	cteint | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "int"; 
-				if(K.place != 0) K.cod = gen("goto", K.true); else K.cod = gen("goto", K.false);
-			 }
+				if(K.place != 0) K.cod = gen("goto", K.true); else K.cod = gen("goto", K.false); }
 	ctelong | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "long"; 
-				if(K.place != 0) K.cod = gen("goto", K.true); else K.cod = gen("goto", K.false);
-			  }
+				if(K.place != 0) K.cod = gen("goto", K.true); else K.cod = gen("goto", K.false); }
 	ctefloat |{ K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "float"; 
-				if(K.place != 0) K.cod = gen("goto", K.true); else K.cod = gen("goto", K.false);
-			  }
+				if(K.place != 0) K.cod = gen("goto", K.true); else K.cod = gen("goto", K.false); }
 	ctebool | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "bool";
-					if (cte.val == true) K.cod = gen("goto", K.true); else K.cod = gen("goto", K.false);
-			  }
+				if (cte.val == true) K.cod = gen("goto", K.true); else K.cod = gen("goto", K.false); }
 	Funcao
 

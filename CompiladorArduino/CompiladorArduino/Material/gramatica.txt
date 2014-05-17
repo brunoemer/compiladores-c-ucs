@@ -73,9 +73,15 @@ AtribOp ->
 	/= Exp   { AtribOp.place = criatemp(); AtribOp.cod = Exp.cod + 
 				gen(/, AtribOp.place, AtribOp.id, Exp.place) + gen(=, AtribOp.id, AtribOp.place) }
 
-Exp -> T R
-R -> || T R1
-R -> Ɛ
+Exp -> { T.true = E.true; T.false = E.false(geralabel???) } T { 
+	R.hc = T.cod; R.hp = T.place; R.ht = T.tipo; R.htrue = E.true; R.hfalse = E.false } R { 
+	E.cod = R.sc; E.place = R.sp; E.tipo = R.st }
+R -> || T { if(E.true != null){ R1.hc = R.hc || gen(LB???, ':') || T.cod;
+	}else{ E.place = criatemp(); R1.hc = R.hc || T.cod || gen(||, R1.hp, V.hp, T.place);
+	R1.ht = geratipo(||, R.ht, T.tipo) 
+	} R1 {
+	R.sc = R1.sc; R.sp = R1.sp; R.st = R1.st }
+R -> Ɛ { R.sc = R.hc; R.sp = R1.sp; R.st = R1.st }
 
 T -> F U
 U -> && F U1
@@ -83,6 +89,12 @@ U -> Ɛ
 
 F -> G
 G -> !G
+
+G -> {H.true = G.true; H.false = G.false} H { V.hc = H.cod; V.hp = H.place; V.ht = H.tipo; 
+	V.true = G.true; V.false = G.false } V { G.cod = V.sc; G.place = V.sp; G.tipo = V.st }
+V -> > H { V1.hp = criatemp(); V1.hc = V.hc + H.cod + gen(>, V1.hp, V.hp, H.place);
+		if(V.htrue!=null) V1.hc += gen("if", V1.hp, "!= 0 goto", V.htrue) || gen("goto", V.hfalse);
+		V1.ht = TableSymbol.CalcType(>, V.ht, H.tipo) } V1 { V.sp = V1.sp; V.sc = V1.sc; V.st = V1.st }
 
 G -> H { V.hc = H.cod; V.hp = H.place; V.ht = H.tipo } V { G.cod = V.sc; G.place = V.sp; G.tipo = V.st }
 V -> > H { V1.hp = criatemp(); V1.hc = V.hc + H.cod + gen(>, V1.hp, V.hp, H.place);
