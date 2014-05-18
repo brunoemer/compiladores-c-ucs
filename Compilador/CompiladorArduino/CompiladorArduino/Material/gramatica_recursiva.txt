@@ -6,7 +6,7 @@ IfEnd ->
 	""
 
 Atribuicao -> 
-	id = E { Atribuicao.cod = E.cod + gen(=, id.cod, E.place) }
+	id = E { Atribuicao.cod = E.cod || gen(=, id.cod, E.place) }
 
 E -> { E1.true = E.true; Lb = geralabel(); E1.false = Lb } E1 || { T.true = E.true; T.false = E.false } T {
 		if(E.true != null){ E.cod = E1.cod || gen(Lb, ':') || T.cod; }
