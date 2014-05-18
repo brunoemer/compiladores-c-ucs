@@ -9,6 +9,7 @@ namespace CompiladorArduino
     {
         static void Main(string[] args)
         {
+            /*
             bool debug = true;
 
             Console.WriteLine("Iniciado processo...");
@@ -66,6 +67,8 @@ namespace CompiladorArduino
 
             Console.WriteLine("Processo concluído, precione uma tecla...");
             Console.ReadKey();
+        }
+             */
         }
     }
 }

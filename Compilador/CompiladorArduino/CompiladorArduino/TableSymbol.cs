@@ -22,6 +22,11 @@ namespace CompiladorArduino
             }
         }
 
+        public void TableSymbolReset()
+        {
+            TabelaSimbolos.Clear();
+        }
+
         private List<Symbol> TabelaSimbolos;
         
         public static String GlobalContext = "";

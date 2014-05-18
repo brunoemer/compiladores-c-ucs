@@ -32,9 +32,20 @@ namespace CompiladorArduino
         public LineManager()
         {
             this.LineIndex = 0;
-            this.Lines = Arquivo.Read(@"Arquivos/entrada.txt");
+
+        }
+
+        public void setArduinoCode(String arduinoCode)
+        {
+             List<string> list = new List<string>(
+                                       arduinoCode.Split(new string[] { "\r\n" },
+                                       StringSplitOptions.RemoveEmptyEntries));
+             this.Lines = list;//Arquivo.Read(@"Arquivos/entrada.txt");
 
             this.LinesOut = new List<String>();
+            this.LineIndex = 0;
+            this.PosCurrentCaracter = 0;
+            this.PosStartToken = 0;
         }
 
         public bool ReadLine()

@@ -8,8 +8,11 @@ namespace CompiladorArduino
 {
     public class AnalisadorSintatico
     {
-        public String Execute()
+        public String Execute(String ArduinoCode)
         {
+            LineManager.Instance.setArduinoCode(ArduinoCode);
+            TableSymbol.Instance.TableSymbolReset();
+
             if (LineManager.Instance.ReadLine())
             {
                 String ProgCod;
