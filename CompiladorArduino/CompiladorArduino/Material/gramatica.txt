@@ -63,23 +63,23 @@ TipoVar ->
 Atribuicao -> 
 	id { TableSymbol.ExistsVar(id.cod); AtribOp.id = id.cod } AtribOp { Atribuicao.cod = AtribOp.cod }
 AtribOp ->
-	= Exp  | { AtribOp.cod = Exp.cod + gen(=, AtribOp.id, Exp.place) }
-	+= Exp | { AtribOp.place = criatemp(); AtribOp.cod = Exp.cod + 
-				gen(+, AtribOp.place, AtribOp.id, Exp.place) + gen(=, AtribOp.id, AtribOp.place) }
-	-= Exp | { AtribOp.place = criatemp(); AtribOp.cod = Exp.cod + 
-				gen(-, AtribOp.place, AtribOp.id, Exp.place) + gen(=, AtribOp.id, AtribOp.place) }
-	*= Exp | { AtribOp.place = criatemp(); AtribOp.cod = Exp.cod + 
-				gen(*, AtribOp.place, AtribOp.id, Exp.place) + gen(=, AtribOp.id, AtribOp.place) }
-	/= Exp   { AtribOp.place = criatemp(); AtribOp.cod = Exp.cod + 
-				gen(/, AtribOp.place, AtribOp.id, Exp.place) + gen(=, AtribOp.id, AtribOp.place) }
+	= Exp  | { AtribOp.cod = Exp.cod || gen(=, AtribOp.id, Exp.place) }
+	+= Exp | { AtribOp.place = criatemp(); AtribOp.cod = Exp.cod || 
+				gen(+, AtribOp.place, AtribOp.id, Exp.place) || gen(=, AtribOp.id, AtribOp.place) }
+	-= Exp | { AtribOp.place = criatemp(); AtribOp.cod = Exp.cod || 
+				gen(-, AtribOp.place, AtribOp.id, Exp.place) || gen(=, AtribOp.id, AtribOp.place) }
+	*= Exp | { AtribOp.place = criatemp(); AtribOp.cod = Exp.cod || 
+				gen(*, AtribOp.place, AtribOp.id, Exp.place) || gen(=, AtribOp.id, AtribOp.place) }
+	/= Exp   { AtribOp.place = criatemp(); AtribOp.cod = Exp.cod || 
+				gen(/, AtribOp.place, AtribOp.id, Exp.place) || gen(=, AtribOp.id, AtribOp.place) }
 
 Exp -> T { R.hc = T.cod; R.hp = T.place; R.ht = T.tipo } R { Exp.cod = R.sc; Exp.place = R.sp; Exp.tipo = R.st }
-R -> || T { R1.hp = criatemp(); R1.hc = R.hc + T.cod + gen(||, R1.hp, R.hp, T.place);
+R -> || T { R1.hp = criatemp(); R1.hc = R.hc || T.cod || gen(||, R1.hp, R.hp, T.place);
 			R1.ht = TableSymbol.CalcType(||, R.ht, T.tipo) } R1 { R.sp = R1.sp; R.sc = R1.sc; R.st = R1.st }
 R -> Ɛ { R.sp = R.hp; R.sc = R.hc; R.st = R.ht }
 
 T -> F { U.hc = F.cod; U.hp = F.place; U.ht = F.tipo } U { T.cod = U.sc; T.place = U.sp; T.tipo = U.st }
-U -> && F { U1.hp = criatemp(); U1.hc = U.hc + F.cod + gen(&&, U1.hp, U.hp, F.place);
+U -> && F { U1.hp = criatemp(); U1.hc = U.hc || F.cod || gen(&&, U1.hp, U.hp, F.place);
 			U1.ht = TableSymbol.CalcType(&&, U.ht, F.tipo) } U1 { U.sp = U1.sp; U.sc = U1.sc; U.st = U1.st }
 U -> Ɛ { U.sp = U.hp; U.sc = U.hc; U.st = U.ht }
 
@@ -87,33 +87,33 @@ F -> G { F.cod = G.cod; F.place = G.place; F.tipo = G.tipo }
 G -> !G1 { G.place = criatemp(); G.cod = G1.cod || gen(!, G.place, G1.place); G.tipo = G1.tipo }
 
 G -> H { V.hc = H.cod; V.hp = H.place; V.ht = H.tipo } V { G.cod = V.sc; G.place = V.sp; G.tipo = V.st }
-V -> > H { V1.hp = criatemp(); V1.hc = V.hc + H.cod + gen(>, V1.hp, V.hp, H.place);
+V -> > H { V1.hp = criatemp(); V1.hc = V.hc || H.cod || gen(>, V1.hp, V.hp, H.place);
 			V1.ht = TableSymbol.CalcType(>, V.ht, H.tipo) } V1 { V.sp = V1.sp; V.sc = V1.sc; V.st = V1.st }
-V -> == H { V1.hp = criatemp(); V1.hc = V.hc + H.cod + gen(==, V1.hp, V.hp, H.place);
+V -> == H { V1.hp = criatemp(); V1.hc = V.hc || H.cod || gen(==, V1.hp, V.hp, H.place);
 			V1.ht = TableSymbol.CalcType(==, V.ht, H.tipo) } V1 { V.sp = V1.sp; V.sc = V1.sc; V.st = V1.st }
-V -> < H { V1.hp = criatemp(); V1.hc = V.hc + H.cod + gen(<, V1.hp, V.hp, H.place);
+V -> < H { V1.hp = criatemp(); V1.hc = V.hc || H.cod || gen(<, V1.hp, V.hp, H.place);
 			V1.ht = TableSymbol.CalcType(<, V.ht, H.tipo) } V1 { V.sp = V1.sp; V.sc = V1.sc; V.st = V1.st }
-V -> >= H { V1.hp = criatemp(); V1.hc = V.hc + H.cod + gen(>=, V1.hp, V.hp, H.place);
+V -> >= H { V1.hp = criatemp(); V1.hc = V.hc || H.cod || gen(>=, V1.hp, V.hp, H.place);
 			V1.ht = TableSymbol.CalcType(>=, V.ht, H.tipo) } V1 { V.sp = V1.sp; V.sc = V1.sc; V.st = V1.st }
-V -> != H { V1.hp = criatemp(); V1.hc = V.hc + H.cod + gen(!=, V1.hp, V.hp, H.place);
+V -> != H { V1.hp = criatemp(); V1.hc = V.hc || H.cod || gen(!=, V1.hp, V.hp, H.place);
 			V1.ht = TableSymbol.CalcType(!=, V.ht, H.tipo) } V1 { V.sp = V1.sp; V.sc = V1.sc; V.st = V1.st }
-V -> <= H { V1.hp = criatemp(); V1.hc = V.hc + H.cod + gen(<=, V1.hp, V.hp, H.place);
+V -> <= H { V1.hp = criatemp(); V1.hc = V.hc || H.cod || gen(<=, V1.hp, V.hp, H.place);
 			V1.ht = TableSymbol.CalcType(<=, V.ht, H.tipo) } V1 { V.sp = V1.sp; V.sc = V1.sc; V.st = V1.st }
 V -> Ɛ { V.sp = V.hp; V.sc = V.hc; V.st = V.ht }
 
 H -> J { X.hc = J.cod; X.hp = J.place; X.ht = J.tipo } X { H.cod = X.sc; H.place = X.sp; H.tipo = X.st }
-X -> + J { X1.hp = criatemp(); X1.hc = X.hc + J.cod + gen(+, X1.hp, X.hp, J.place); 
+X -> + J { X1.hp = criatemp(); X1.hc = X.hc || J.cod || gen(+, X1.hp, X.hp, J.place); 
 			X1.ht = TableSymbol.CalcType(+, X.ht, J.tipo) } X1 { X.sp = X1.sp; X.sc = X1.sc; X.st = X1.st }
-X -> - J { X1.hp = criatemp(); X1.hc = X.hc + J.cod + gen(-, X1.hp, X.hp, J.place); 
+X -> - J { X1.hp = criatemp(); X1.hc = X.hc || J.cod || gen(-, X1.hp, X.hp, J.place); 
 			X1.ht = TableSymbol.CalcType(-, X.ht, J.tipo) } X1 { X.sp = X1.sp; X.sc = X1.sc; X.st = X1.st }
 X -> Ɛ { X.sp = X.hp; X.sc = X.hc; X.st = X.ht }
 
 J -> K { Y.hc = K.cod; Y.hp = K.place; Y.ht = K.tipo } Y { J.cod = Y.sc; J.place = Y.sp; J.tipo = Y.st }
-Y -> * K { Y1.hp = criatemp(); T1.hc = Y.hc + K.cod + gen(*, Y1.hp, Y.hp, K.place);
+Y -> * K { Y1.hp = criatemp(); T1.hc = Y.hc || K.cod || gen(*, Y1.hp, Y.hp, K.place);
 			Y1.ht = TableSymbol.CalcType(*, Y.ht, K.tipo) } Y1 { Y.sp = Y1.sp; Y.sc = Y1.sc; Y.st = Y1.st }
-Y -> / K { Y1.hp = criatemp(); T1.hc = Y.hc + K.cod + gen(/, Y1.hp, Y.hp, K.place);
+Y -> / K { Y1.hp = criatemp(); T1.hc = Y.hc || K.cod || gen(/, Y1.hp, Y.hp, K.place);
 			Y1.ht = TableSymbol.CalcType(/, Y.ht, K.tipo) } Y1 { Y.sp = Y1.sp; Y.sc = Y1.sc; Y.st = Y1.st }
-Y -> % K { Y1.hp = criatemp(); T1.hc = Y.hc + K.cod + gen(%, Y1.hp, Y.hp, K.place);
+Y -> % K { Y1.hp = criatemp(); T1.hc = Y.hc || K.cod || gen(%, Y1.hp, Y.hp, K.place);
 			Y1.ht = TableSymbol.CalcType(%, Y.ht, K.tipo) } Y1 { Y.sp = Y1.sp; Y.sc = Y1.sc; Y.st = Y1.st }
 Y -> Ɛ { Y.sp = Y.hp; Y.sc = Y.hc; Y.st = Y.ht }
 
