@@ -1,8 +1,9 @@
-﻿int i, j;
+﻿
 float a, b;
-long c;
-bool d;
 
+<<<<<<< .mine
+a = b + 3;
+=======
 i = j + a * b;
 j -= i - (2 * i);
 i = 1 + 2 - (5 - 7 * (5 / 8)) + 3;
@@ -15,4 +16,4 @@ d = 4 * 1 || 2;
 d = 3 > 1 > 2;
 
 int end, fim;
-end = fim;
+end = fim;>>>>>>> .r23

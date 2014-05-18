@@ -7,8 +7,8 @@
     <ProjectGuid>{F3EF0478-1985-495D-A258-462BF8603853}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Compilador</RootNamespace>
-    <AssemblyName>Compilador</AssemblyName>
+    <RootNamespace>CompiladorArduino</RootNamespace>
+    <AssemblyName>CompiladorArduino</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -72,7 +72,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Arquivos\tablesymbol.txt" />
-    <Content Include="Material\gramatica_2.0.txt" />
     <Content Include="Material\gramatica_recursiva.txt" />
     <Content Include="Material\gramatica.txt" />
   </ItemGroup>

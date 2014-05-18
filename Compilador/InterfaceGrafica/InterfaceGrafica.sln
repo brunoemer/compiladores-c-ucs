@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterfaceGrafica", "Interfa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastColoredTextBox", "..\FastColoredTextBox\FastColoredTextBox.csproj", "{6DD14A85-CCFC-4774-BD26-0F5772512319}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compilador", "..\CompiladorArduino\CompiladorArduino\Compilador.csproj", "{F3EF0478-1985-495D-A258-462BF8603853}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompiladorArduino", "..\CompiladorArduino\CompiladorArduino\CompiladorArduino.csproj", "{F3EF0478-1985-495D-A258-462BF8603853}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
