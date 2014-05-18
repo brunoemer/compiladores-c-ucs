@@ -73,18 +73,41 @@ AtribOp ->
 	/= Exp   { AtribOp.place = criatemp(); AtribOp.cod = Exp.cod + 
 				gen(/, AtribOp.place, AtribOp.id, Exp.place) + gen(=, AtribOp.id, AtribOp.place) }
 
-Exp -> T { R.hc = T.cod; R.hp = T.place; R.ht = T.tipo } R { Exp.cod = R.sc; Exp.place = R.sp; Exp.tipo = R.st }
-R -> || T { R1.hp = criatemp(); R1.hc = R.hc + T.cod + gen(||, R1.hp, R.hp, T.place);
-			R1.ht = TableSymbol.CalcType(||, R.ht, T.tipo) } R1 { R.sp = R1.sp; R.sc = R1.sc; R.st = R1.st }
-R -> Ɛ { R.sp = R.hp; R.sc = R.hc; R.st = R.ht }
+------------
+TESTE
+Exp -> { R.htrue = E.true; R.hfalse = E.false; T.true = E.true; Lb = geralabel(); T.false = Lb???E.false???; } T { 
+	R.hc = T.cod; R.hp = T.place; R.ht = T.tipo; R.Lb = Lb?? } R { E.cod = R.sc; E.place = R.sp; E.tipo = R.st }
+R -> { R1.htrue = R.htrue; R1.hfalse = R.hfalse } || { T.true = R.htrue; Lb = geralabel(); T.false = Lb } T { 
+	if(R.htrue != null){ R1.hc = R.hc || gen(Lb??R.Lb???, ':') || T.cod; }
+	else{ R1.hp = criatemp(); R1.hc = R.hc || T.cod || gen(||, R1.hp, R.hp, T.place); }
+	R1.ht = geratipo(||, R.ht, T.tipo);
+	} R1 { R.sc = R1.sc; R.sp = R1.sp; R.st = R1.st }
+R -> Ɛ { R.sc = R.hc; R.sp = R1.sp; R.st = R1.st }
 
-T -> F { U.hc = F.cod; U.hp = F.place; U.ht = F.tipo } U { T.cod = U.sc; T.place = U.sp; T.tipo = U.st }
-U -> && F { U1.hp = criatemp(); U1.hc = U.hc + F.cod + gen(&&, U1.hp, U.hp, F.place);
-			U1.ht = TableSymbol.CalcType(&&, U.ht, F.tipo) } U1 { U.sp = U1.sp; U.sc = U1.sc; U.st = U1.st }
-U -> Ɛ { U.sp = U.hp; U.sc = U.hc; U.st = U.ht }
+//teste 2
+Exp -> {Rhtrue=E.true; Rhfalse=geralabel(); T.true??} T {
+	Rhc=T.cod; Rhp=T.place; Rht=T.tipo} R {E.cod=Rsc; E.place=Rsp; E.tipo=Rst}
+R -> {R1htrue=Rhtrue; R1hfalse=Rhfalse} || {T.true=Rhtrue; T.false=Rhfalse} T {
+	if(Rhtrue!=null){ R1hc=Rhc || gen(Rhfalse,':') || T.cod; }
+	else{ R1hp=criatemp(); R1hc=Rhc || T.cod || gen(||, R1hp, Rhp, T.place); }
+	R1ht=geratipo(||, Rht, T.tipo);
+	} R1 { R.sc = R1.sc; R.sp = R1.sp; R.st = R1.st }
+R -> Ɛ { R.sc = R.hc; R.sp = R1.sp; R.st = R1.st }
+------------
 
-F -> G { F.cod = G.cod; F.place = G.place; F.tipo = G.tipo }
-G -> !G1 { G.place = criatemp(); G.cod = G1.cod || gen(!, G.place, G1.place); G.tipo = G1.tipo }
+Exp -> T R
+R -> || T R1
+R -> Ɛ
+
+T -> F U
+U -> && F U1
+U -> Ɛ
+
+F -> G
+G -> !G
+
+--G -> H1 > H2  { G.place = criatemp(); G.cod = H1.cod || H2.cod || gen(>, G.place, H1.place, H2.place); G.tipo = TableSymbol.CalcType(>, H1.tipo, H2.tipo);
+		if(G.true != null) G.cod += gen("if", G.place, "!= 0 goto", G.true) || gen("goto", G.false); }
 
 G -> H { V.hc = H.cod; V.hp = H.place; V.ht = H.tipo } V { G.cod = V.sc; G.place = V.sp; G.tipo = V.st }
 V -> > H { V1.hp = criatemp(); V1.hc = V.hc + H.cod + gen(>, V1.hp, V.hp, H.place);
@@ -101,7 +124,8 @@ V -> <= H { V1.hp = criatemp(); V1.hc = V.hc + H.cod + gen(<=, V1.hp, V.hp, H.pl
 			V1.ht = TableSymbol.CalcType(<=, V.ht, H.tipo) } V1 { V.sp = V1.sp; V.sc = V1.sc; V.st = V1.st }
 V -> Ɛ { V.sp = V.hp; V.sc = V.hc; V.st = V.ht }
 
-H -> J { X.hc = J.cod; X.hp = J.place; X.ht = J.tipo } X { H.cod = X.sc; H.place = X.sp; H.tipo = X.st }
+H -> J { X.hc = J.cod; X.hp = J.place; X.ht = J.tipo } X { H.cod = X.sc; H.place = X.sp; H.tipo = X.st;
+--		if(H.true != null && J.place == X.sp???) H.cod += gen("if", H.place, "!= 0 goto", H.true) || gen("goto", H.false); }
 X -> + J { X1.hp = criatemp(); X1.hc = X.hc + J.cod + gen(+, X1.hp, X.hp, J.place); 
 			X1.ht = TableSymbol.CalcType(+, X.ht, J.tipo) } X1 { X.sp = X1.sp; X.sc = X1.sc; X.st = X1.st }
 X -> - J { X1.hp = criatemp(); X1.hc = X.hc + J.cod + gen(-, X1.hp, X.hp, J.place); 
@@ -118,36 +142,50 @@ Y -> % K { Y1.hp = criatemp(); T1.hc = Y.hc + K.cod + gen(%, Y1.hp, Y.hp, K.plac
 Y -> Ɛ { Y.sp = Y.hp; Y.sc = Y.hc; Y.st = Y.ht }
 
 K ->
-	id |       { K.place = id.cod; K.cod = ""; TableSymbol.Exists(id.cod); K.tipo = TableSymbol.getType(id.cod) }
-	(Exp) |    { K.place = Exp.place; K.cod = Exp.cod; K.tipo = Exp.tipo }
-	cteint |   { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "int" }
-	ctelong |  { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "long" }
-	ctefloat | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "float" }
-	ctebool | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "bool" }
-	byte | //REMOVER
-    Funcao
+	id |    { K.place = id.cod; K.cod = ""; TableSymbol.Exists(id.cod); K.tipo = TableSymbol.getType(id.cod);
+				if(K.tipo == "bool") K.cod = gen("if", K.place, "== true goto", K.true) || gen("goto", K.false); }
+	(E) |   { K.place = E.place; K.cod = E.cod; K.tipo = E.tipo; 
+				E.true = K.true; E.false = K.false; }
+	cteint | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "int"; 
+				if(K.place != 0) K.cod = gen("goto", K.true); else K.cod = gen("goto", K.false); }
+	ctelong | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "long"; 
+				if(K.place != 0) K.cod = gen("goto", K.true); else K.cod = gen("goto", K.false); }
+	ctefloat |{ K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "float"; 
+				if(K.place != 0) K.cod = gen("goto", K.true); else K.cod = gen("goto", K.false); }
+	ctebool | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "bool";
+				if (cte.val == true) K.cod = gen("goto", K.true); else K.cod = gen("goto", K.false); }
+	Funcao
 
 If ->
-	if ( Exp ) {{ ListaComandos }} IfEnd
+	if ( { LIni = geralabel(); LElse = geralabel(); LFim = geralabel(); E.true = LIf; E.false = LElse } E ) 
+		{{ {gen(LIf, ':')} ListaComandos }} {IfEnd.Lelse = Lelse} IfEnd
 IfEnd ->
-	else {{ ListaComandos }} |
-	else If |
+	else { gen(IfEnd.Lelse, ':') } {{ ListaComandos }} |
+	else { gen(IfEnd.Lelse, ':') } If |
 	""
-	
-// Falta adicionar break e continue
+
 While ->
-	while ( Exp ) {{ ListaComandos }}
+	while ( Exp ) {{ LoopCom }} { LIni = geralabel(); LFim = geralabel();
+		While.cod = gen(LIni, ':') || Exp.cod || gen("if", Exp.place, "= 0", "goto", LFim) 
+		|| LoopCom.cod || gen("goto", LIni) || gen(LFim, ':') }
 
 DoWhile ->
-	do {{ ListaComandos }} while ( Exp );
+	do {{ LoopCom }} while ( Exp ); { LIni = geralabel(); LFim = geralabel();
+		DoWhile.cod = gen(LIni, ':') || LoopCom.cod || Exp.cod || gen("if", Exp.place, "!= 0", "goto", LFim)
+		|| gen("goto", LIni) || gen(LFim, ':') }
 
 For ->
-	for ( ListaAtrib; Exp; ListaAtrib ) {{ ListaComandos }}
+	for ( ListaAtrib; Exp; ListaAtrib ) {{ LoopCom }}
 ListaAtrib ->
 	Atribuicao ListaAtribA
 ListaAtribA ->
 	, Atribuicao ListaAtribA |
 	""
+
+LoopCom ->
+	break | {  }
+	continue | {  }
+	ListaComandos {  }
 
 Funcao ->
 	id ( { TableSymbol.ExistsFunction(id.cod) } ListaParam );
@@ -172,3 +210,13 @@ CaseEnd ->
 SwitchDefault ->
 	default: {{ ListaComandos CaseEnd |
 	""
+
+
+// Duvidas
+-Separar blocos de comandos dos loops, if e funcao {}? nao precisa
+-Como fazer verificacao de tipo na atribuicao? float pode ser atribuido para int
+-Adicionar atribuicao com operadores reduzidos(+= *= ...)? fazer
+-Como fica exp de id = 1 || 2 ? tratar como int
+-boolean em c nao existe, como tratar?
+-como fica operadores ! ?
+-goto no && e ||
