@@ -12,7 +12,7 @@ namespace CompiladorArduino
         Function = 1
     }
 
-    class Symbol
+    public class Symbol
     {
         public String id;
         public int type; // int, float... 

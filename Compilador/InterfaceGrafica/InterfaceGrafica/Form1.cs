@@ -38,11 +38,26 @@ namespace InterfaceGrafica
             fctb.IsChanged = false;
             fctb.ClearUndo();
             fctb.Text = @"
+int i, j;
 float a, b;
+long c;
+bool d;
 
-a = b + 3;
-a = 1 + 2;
-                ";
+i = j + a * b;
+j -= i - (2 * i);
+i = 1 + 2 - (5 - 7 * (5 / 8)) + 3;
+
+i = (1 || 2) + 1;
+d = 1 && 0 + 1;
+
+d = 1 || 2 * 3;
+d = 4 * 1 || 2;
+d = 3 > 1 > 2;
+
+int end, fim;
+end = fim;
+
+";
 
 
         }
@@ -61,19 +76,21 @@ a = 1 + 2;
                     sb.Append(item);
                 }
 
-                //String ts = CompiladorArduino.ta "";// TableSymbol.Instance.ToString();
-
-                //Console.WriteLine("Lex:\n" + sb.ToString());
-                //Console.WriteLine("TableSymbol:\n" + ts);
-
                 textBoxC3E.Text = codigo;
-                textBoxErrors.Text = "";
+                textBoxErrors.Text = "Compilado\r\n-----------------------\r\n\r\n";
+
+                String ts = TableSymbol.Instance.ToString();
+                textBoxC3E.Text += Environment.NewLine + "Tabela simbolos:" + Environment.NewLine + ts;
 
             }
             catch (AnalisadorException ae)
             {
                 textBoxC3E.Text = "";
                 textBoxErrors.Text = ae.Message + Environment.NewLine;
+                textBoxErrors.Text += String.Format("Posição vetor da string: {0}{1}", ae.Pos, Environment.NewLine);
+                textBoxErrors.Text += String.Format("Posição coluna: {0}{1}", ae.Col, Environment.NewLine);
+                textBoxErrors.Text += String.Format("Linha: {0} ", ae.Linha);
+                textBoxErrors.Text += String.Format("Token: {0}{1}-----------------------{1}{1}", ae.Token, Environment.NewLine);
                /* Console.WriteLine();
                 Console.WriteLine("---ESTADO---");
                 Console.WriteLine();

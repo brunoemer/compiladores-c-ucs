@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CompiladorArduino
 {
-    class TableSymbol
+    public class TableSymbol
     {
         private static TableSymbol _Instance { get; set; }
         public static TableSymbol Instance
