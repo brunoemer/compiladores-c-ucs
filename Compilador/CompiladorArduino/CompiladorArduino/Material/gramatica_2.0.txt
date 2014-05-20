@@ -75,24 +75,25 @@ AtribOp ->
 
 ------------
 TESTE
-Exp -> { R.htrue = E.true; R.hfalse = E.false; T.true = E.true; Lb = geralabel(); T.false = Lb???E.false???; } T { 
-	R.hc = T.cod; R.hp = T.place; R.ht = T.tipo; R.Lb = Lb?? } R { E.cod = R.sc; E.place = R.sp; E.tipo = R.st }
+Exp -> { R.htrue = Exp.true; Lb = geralabel(); R.hfalse = Lb; } T { 
+	R.hc = T.cod; R.hp = T.place; R.ht = T.tipo; R.Lb = Lb } R { Exp.cod = R.sc; Exp.place = R.sp; Exp.tipo = R.st;
+		if(Exp.true != null && R.hp = R.sp){ Exp.cod += gen(Lb, ':') || gen("goto", Exp.false) } }
 R -> { R1.htrue = R.htrue; R1.hfalse = R.hfalse } || { T.true = R.htrue; Lb = geralabel(); T.false = Lb } T { 
-	if(R.htrue != null){ R1.hc = R.hc || gen(Lb??R.Lb???, ':') || T.cod; }
+	if(R.htrue != null){ R1.hc = R.hc || gen(R.Lb, ':') || T.cod; }
 	else{ R1.hp = criatemp(); R1.hc = R.hc || T.cod || gen(||, R1.hp, R.hp, T.place); }
-	R1.ht = geratipo(||, R.ht, T.tipo);
+	R1.ht = geratipo(||, R.ht, T.tipo); R1.Lb = Lb;
 	} R1 { R.sc = R1.sc; R.sp = R1.sp; R.st = R1.st }
 R -> Ɛ { R.sc = R.hc; R.sp = R1.sp; R.st = R1.st }
 
-//teste 2
-Exp -> {Rhtrue=E.true; Rhfalse=geralabel(); T.true??} T {
-	Rhc=T.cod; Rhp=T.place; Rht=T.tipo} R {E.cod=Rsc; E.place=Rsp; E.tipo=Rst}
-R -> {R1htrue=Rhtrue; R1hfalse=Rhfalse} || {T.true=Rhtrue; T.false=Rhfalse} T {
-	if(Rhtrue!=null){ R1hc=Rhc || gen(Rhfalse,':') || T.cod; }
-	else{ R1hp=criatemp(); R1hc=Rhc || T.cod || gen(||, R1hp, Rhp, T.place); }
-	R1ht=geratipo(||, Rht, T.tipo);
-	} R1 { R.sc = R1.sc; R.sp = R1.sp; R.st = R1.st }
-R -> Ɛ { R.sc = R.hc; R.sp = R1.sp; R.st = R1.st }
+-if(false || true || false)
+T1 = false
+goto L2
+L2:T2 = true
+goto L1
+L3:T3 = false
+goto L4
+L4:
+se true: L1:
 ------------
 
 Exp -> T R
