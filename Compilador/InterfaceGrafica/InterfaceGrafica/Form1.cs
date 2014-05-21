@@ -143,7 +143,9 @@ end = fim;
             e.ChangedRange.SetFoldingMarkers("{", "}");//allow to collapse brackets block
             e.ChangedRange.SetFoldingMarkers(@"#region\b", @"#endregion\b");//allow to collapse #region blocks
             e.ChangedRange.SetFoldingMarkers(@"/\*", @"\*/");//allow to collapse comment block
-            Compile();
+            timer1.Enabled = false;
+            timer1.Enabled = true;
+                      
         }
 
         private void fctb_TextChanged(object sender, TextChangedEventArgs e)
@@ -173,6 +175,14 @@ end = fim;
             if (ranges.Length > 1)
                 foreach (var r in ranges)
                     r.SetStyle(SameWordsStyle);
+        }
+
+        
+        private void timer1_Tick_1(object sender, EventArgs e)
+        {
+
+            Compile();
+            timer1.Enabled = false;
         }
     }
 }

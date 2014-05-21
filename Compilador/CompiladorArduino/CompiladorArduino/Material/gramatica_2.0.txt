@@ -104,8 +104,8 @@ T -> F U
 U -> && F U1
 U -> Ɛ
 
-F -> G
-G -> !G
+F -> { G.true = F.true; G.false = F.false } G { F.cod = G.cod; F.place = G.place; F.tipo = G.tipo }
+G -> ! { G1.false = G.true; G1.true = G.false } G1 { G.place = criatemp(); G.cod = G1.cod || gen(!, G.place, G1.place); G.tipo = G1.tipo }
 
 --G -> H1 > H2  { G.place = criatemp(); G.cod = H1.cod || H2.cod || gen(>, G.place, H1.place, H2.place); G.tipo = TableSymbol.CalcType(>, H1.tipo, H2.tipo);
 		if(G.true != null) G.cod += gen("if", G.place, "!= 0 goto", G.true) || gen("goto", G.false); }
