@@ -135,21 +135,21 @@ IfEnd ->
 	else If | { IfEnd.cod = gen(IfEnd.LElse, ':') || If.cod || gen("goto", IfEnd.LFim) }
 	"" { IfEnd.cod = "" }
 
-ExpCond -> { CR.htrue = ExpCond.true; Lb = geralabel(); CR.hfalse = Lb; CT.true = ExpCond.true; CT.false = ExpCond.false } CT { 
-	CR.hc = CT.cod; CR.hp = CT.place; CR.Lb = Lb } CR { ExpCond.cod = CR.sc; ExpCond.place = CR.sp;
-		if(CR.hp = CR.sp){ ExpCond.cod += gen(Lb, ':') || gen("goto", ExpCond.false) } }
-CR -> { CR1.htrue = CR.htrue; CR1.hfalse = CR.hfalse } || { CT.true = CR.htrue; Lb = geralabel(); CT.false = Lb } CT { 
-	CR1.hc = CR.hc || gen(CR.Lb, ':') || CT.cod; CR1.Lb = Lb;
-	} CR1 { CR.sc = CR1.sc; CR.sp = CR1.sp }
-CR -> Ɛ { CR.sc = CR.hc; CR.sp = CR.hp }
+ExpCond -> { CR.htrue = ExpCond.true; Lb = geralabel(); CR.hfalse = Lb; CR.false = ExpCond.false; 
+	CT.true = CR.htrue; CT.false = Lb } CT { CR.hc = CT.cod; CR.hp = CT.place; CR.Lb = Lb } CR { 
+	ExpCond.cod = CR.sc; ExpCond.place = CR.sp; }
+CR -> { CR1.htrue = CR.htrue; Lb = geralabel(); CR1.hfalse = Lb; CR1.false = CR.false; CR1.Lb = Lb;
+	CT.true = CR.htrue; CT.false = Lb } || CT { CR1.hc = CR.hc || gen(CR.Lb, ':') || CT.cod; } CR1 { 
+	CR.sc = CR1.sc; CR.sp = CR1.sp }
+CR -> Ɛ { CR.sc = CR.hc; CR.sp = CR.hp; CR.sc += gen(CR.Lb, ':') || gen("goto", CR.false) }
 
-CT -> { Lb = geralabel(); CU.htrue = Lb; CU.hfalse = CT.false; CF.true = CT.true; CF.false = CT.false } CF { 
-	CU.hc = CF.cod; CU.hp = CF.place; CU.Lb = Lb } CU { CT.cod = CU.sc; CT.place = CU.sp;
-		if(CU.hp = CU.sp){ CT.cod += gen(Lb, ':') || gen("goto", CT.true) } }
-CU -> { CU1.htrue = CU.htrue; CU1.hfalse = CU.hfalse } && { Lb = geralabel(); CF.true = Lb; CF.false = CU.hfalse } CF { 
-	CU1.hc = CU.hc || gen(CU.Lb, ':') || CF.cod; CU1.Lb = Lb;
-	} CU1 { CU.sc = CU1.sc; CU.sp = CU1.sp }
-CU -> Ɛ { CU.sc = CU.hc; CU.sp = CU.hp }
+CT -> { Lb = geralabel(); CU.htrue = Lb; CU.hfalse = CT.false; CU.true = CT.true; 
+	CF.true = Lb; CF.false = CT.false } CF { CU.hc = CF.cod; CU.hp = CF.place; CU.Lb = Lb } CU {
+	CT.cod = CU.sc; CT.place = CU.sp; }
+CU -> { Lb = geralabel(); CU1.htrue = Lb; CU1.hfalse = CU.hfalse; CU1.true = CU.true; CU1.Lb = Lb;
+	CF.true = Lb; CF.false = CU.hfalse } && CF { CU1.hc = CU.hc || gen(CU.Lb, ':') || CF.cod; } CU1 { 
+	CU.sc = CU1.sc; CU.sp = CU1.sp }
+CU -> Ɛ { CU.sc = CU.hc; CU.sp = CU.hp; CU.sc += gen(CU.Lb, ':') || gen("goto", CU.true) }
 
 CF -> { CG.true = CF.true; CG.false = CF.false } CG { CF.cod = CG.cod; CF.place = CG.place }
 CG -> ! { CG1.false = CG.true; CG1.true = CG.false } CG1 { CG.place = criatemp(); CG.cod = CG1.cod || gen(!, CG.place, CG1.place)??? }

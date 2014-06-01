@@ -40,8 +40,8 @@ namespace InterfaceGrafica
             fctb.Text = @"
 int i, j;
 
-if(true){
-
+if(false || true){
+    i = j;
 }
 
 int end, fim;

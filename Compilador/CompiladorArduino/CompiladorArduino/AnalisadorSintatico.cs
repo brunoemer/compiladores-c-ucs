@@ -969,21 +969,17 @@ namespace CompiladorArduino
 
             String CTCod, CTPlace, CRhc, CRhp;
 
-            this.ExpCT(out CTCod, out CTPlace, ExpTrue, ExpFalse);
+            this.ExpCT(out CTCod, out CTPlace, CRhTrue, CRhFalse);
             CRhc = CTCod;
             CRhp = CTPlace;
 
             String CRsc, CRsp;
-            this.ExpCR(CRhc, CRhp, out CRsc, out CRsp, CRhTrue, CRhFalse, Lb);
+            this.ExpCR(CRhc, CRhp, out CRsc, out CRsp, CRhTrue, CRhFalse, Lb, ExpFalse);
             ExpCod = CRsc;
             ExpPlace = CRsp;
-
-            if(CRhp == CRsp){
-                ExpCod += Lb + ": goto " + ExpFalse + Environment.NewLine;
-            }
         }
 
-        private void ExpCR(String CRhc, String CRhp, out String CRsc, out String CRsp, String CRhTrue, String CRhFalse, String CRLb)
+        private void ExpCR(String CRhc, String CRhp, out String CRsc, out String CRsp, String CRhTrue, String CRhFalse, String CRLb, String CRFalse)
         {
             AnalisadorLexico.Analisar();
             Int32 opType = TokenManager.Instance.TokenCode;
@@ -1001,15 +997,18 @@ namespace CompiladorArduino
                 CR1hc = CRhc + CRLb + ": " + CTCod;
 
                 String CR1sc, CR1sp;
-                String CR1hTrue = CRhTrue, CR1hFalse = CRhFalse;
-                this.ExpCR(CR1hc, CR1hp, out CR1sc, out CR1sp, CR1hTrue, CR1hFalse, Lb);
+                String CR1hTrue = CRhTrue, CR1hFalse = Lb;
+                this.ExpCR(CR1hc, CR1hp, out CR1sc, out CR1sp, CR1hTrue, CR1hFalse, Lb, CRFalse);
                 CRsc = CR1sc;
                 CRsp = CR1sp;
+
             }
             else
             {
                 CRsc = CRhc;
                 CRsp = CRhp;
+
+                CRsc += CRLb + ": goto(or) " + CRFalse + Environment.NewLine;
             }
         }
 
@@ -1021,24 +1020,19 @@ namespace CompiladorArduino
 
             String CFCod, CFPlace, CUhc, CUhp;
 
-            this.ExpCF(out CFCod, out CFPlace, CTTrue, CTFalse);
+            this.ExpCF(out CFCod, out CFPlace, CUhTrue, CUhFalse);
             CUhc = CFCod;
             CUhp = CFPlace;
 
             String CUsc, CUsp;
-            this.ExpCU(CUhc, CUhp, out CUsc, out CUsp, CUhTrue, CUhFalse, Lb);
+            this.ExpCU(CUhc, CUhp, out CUsc, out CUsp, CUhTrue, CUhFalse, Lb, CTTrue);
             CTCod = CUsc;
             CTPlace = CUsp;
-
-            if (CUhp == CUsp)
-            {
-                CTCod += Lb + ": goto " + CTTrue + Environment.NewLine;
-            }
 
             LineManager.Instance.ResetToLastPos();
         }
 
-        private void ExpCU(String CUhc, String CUhp, out String CUsc, out String CUsp, String CUhTrue, String CUhFalse, String CULb)
+        private void ExpCU(String CUhc, String CUhp, out String CUsc, out String CUsp, String CUhTrue, String CUhFalse, String CULb, String CUTrue)
         {
             AnalisadorLexico.Analisar();
             Int32 opType = TokenManager.Instance.TokenCode;
@@ -1057,7 +1051,7 @@ namespace CompiladorArduino
 
                 String CU1sc, CU1sp;
                 String CU1hTrue = CUhTrue, CU1hFalse = CUhFalse;
-                this.ExpCR(CU1hc, CU1hp, out CU1sc, out CU1sp, CU1hTrue, CU1hFalse, Lb);
+                this.ExpCU(CU1hc, CU1hp, out CU1sc, out CU1sp, CU1hTrue, CU1hFalse, Lb, CUTrue);
                 CUsc = CU1sc;
                 CUsp = CU1sp;
             }
@@ -1065,6 +1059,8 @@ namespace CompiladorArduino
             {
                 CUsc = CUhc;
                 CUsp = CUhp;
+
+                CUsc += CULb + ": goto(and) " + CUTrue + Environment.NewLine;
             }
         }
 
@@ -1321,11 +1317,11 @@ namespace CompiladorArduino
                     CKCod = CKPlace + " = " + tk + Environment.NewLine;
                     if (tkc == LexMap.Consts["TRUE"])
                     {
-                        CKCod += "goto " + CKTrue + Environment.NewLine;
+                        CKCod += "goto(true) " + CKTrue + Environment.NewLine;
                     }
                     else if (tkc == LexMap.Consts["FALSE"])
                     {
-                        CKCod += "goto " + CKFalse + Environment.NewLine;
+                        CKCod += "goto(false) " + CKFalse + Environment.NewLine;
                     }
                 }
 
@@ -1400,6 +1396,8 @@ namespace CompiladorArduino
                 String IfEndCod;
                 this.IfEnd(out IfEndCod, LElse, LFim);
                 IfCod += IfEndCod;
+
+                IfCod += LFim + ": ";
             }
         }
 
@@ -1446,6 +1444,7 @@ namespace CompiladorArduino
             }
             else
             {
+                IfEndCod += LElse + ": ";
                 LineManager.Instance.ResetToLastPos();
             }
         }
