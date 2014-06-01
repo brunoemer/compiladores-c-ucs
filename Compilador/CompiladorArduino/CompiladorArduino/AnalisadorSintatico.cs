@@ -706,32 +706,26 @@ namespace CompiladorArduino
             {
                 is_valid_flag = true;
             }
-
             if (opType == LexMap.Consts["IGUAL"])
             {
                 is_valid_flag = true;
             }
-
             if (opType == LexMap.Consts["MENOR"])
             {
                 is_valid_flag = true;
             }
-
             if (opType == LexMap.Consts["MAIORIGUAL"])
             {
                 is_valid_flag = true;
             }
-
             if (opType == LexMap.Consts["DIFERENTE"])
             {
                 is_valid_flag = true;
             }
-
             if (opType == LexMap.Consts["MENORIGUAL"])
             {
                 is_valid_flag = true;
             }
-
             if (is_valid_flag)
             {
                 String HCod, HPlace, V1hc, V1hp;
@@ -771,25 +765,6 @@ namespace CompiladorArduino
             HCod = Xsc;
             HPlace = Xsp;
             HTipo = Xst;
-
-            LineManager.Instance.ResetToLastPos();
-        }
-
-        public void ExpJ(out String JCod, out String JPlace, out int JTipo)
-        {
-            String KCod, KPlace, Yhc, Yhp;
-            int KTipo, Yht;
-            this.ExpK(out KCod, out KPlace, out KTipo);
-            Yhc = KCod;
-            Yhp = KPlace;
-            Yht = KTipo;
-
-            String Ysc, Ysp;
-            int Yst;
-            this.ExpY(Yhc, Yhp, Yht, out Ysc, out Ysp, out Yst);
-            JCod = Ysc;
-            JPlace = Ysp;
-            JTipo = Yst;
 
             LineManager.Instance.ResetToLastPos();
         }
@@ -835,6 +810,25 @@ namespace CompiladorArduino
             }
         }
 
+        public void ExpJ(out String JCod, out String JPlace, out int JTipo)
+        {
+            String KCod, KPlace, Yhc, Yhp;
+            int KTipo, Yht;
+            this.ExpK(out KCod, out KPlace, out KTipo);
+            Yhc = KCod;
+            Yhp = KPlace;
+            Yht = KTipo;
+
+            String Ysc, Ysp;
+            int Yst;
+            this.ExpY(Yhc, Yhp, Yht, out Ysc, out Ysp, out Yst);
+            JCod = Ysc;
+            JPlace = Ysp;
+            JTipo = Yst;
+
+            LineManager.Instance.ResetToLastPos();
+        }
+
         public void ExpY(String Yhc, String Yhp, int Yht, out String Ysc, out String Ysp, out int Yst)
         {
             AnalisadorLexico.Analisar();
@@ -846,17 +840,14 @@ namespace CompiladorArduino
             {
                 is_valid_flag = true;
             }
-
             if (opType == LexMap.Consts["DIVISAO"])
             {
                 is_valid_flag = true;
             }
-
             if (opType == LexMap.Consts["MODC"])
             {
                 is_valid_flag = true;
             }
-
             if (is_valid_flag)
             {
                 String KCod, KPlace, Y1hc, Y1hp;
@@ -972,11 +963,394 @@ namespace CompiladorArduino
 
         private void ExpCond(out String ExpCod, out String ExpPlace, String ExpTrue, String ExpFalse)
         {
-            ExpCod = "";
-            ExpPlace = "";
+            String Lb = this.GeraLabel();
+            String CRhTrue = ExpTrue;
+            String CRhFalse = Lb;
+
+            String CTCod, CTPlace, CRhc, CRhp;
+
+            this.ExpCT(out CTCod, out CTPlace, ExpTrue, ExpFalse);
+            CRhc = CTCod;
+            CRhp = CTPlace;
+
+            String CRsc, CRsp;
+            this.ExpCR(CRhc, CRhp, out CRsc, out CRsp, CRhTrue, CRhFalse, Lb);
+            ExpCod = CRsc;
+            ExpPlace = CRsp;
+
+            if(CRhp == CRsp){
+                ExpCod += Lb + ": goto " + ExpFalse + Environment.NewLine;
+            }
         }
 
+        private void ExpCR(String CRhc, String CRhp, out String CRsc, out String CRsp, String CRhTrue, String CRhFalse, String CRLb)
+        {
+            AnalisadorLexico.Analisar();
+            Int32 opType = TokenManager.Instance.TokenCode;
+            String opTk = TokenManager.Instance.TokenSymbol;
 
+            if (opType == LexMap.Consts["OU"])
+            {
+                String Lb = this.GeraLabel();
+                String CTTrue = CRhTrue;
+                String CTFalse = Lb;
+                
+                String CTCod, CTPlace, CR1hc, CR1hp;
+                this.ExpCT(out CTCod, out CTPlace, CTTrue, CTFalse);
+                CR1hp = "";
+                CR1hc = CRhc + CRLb + ": " + CTCod;
+
+                String CR1sc, CR1sp;
+                String CR1hTrue = CRhTrue, CR1hFalse = CRhFalse;
+                this.ExpCR(CR1hc, CR1hp, out CR1sc, out CR1sp, CR1hTrue, CR1hFalse, Lb);
+                CRsc = CR1sc;
+                CRsp = CR1sp;
+            }
+            else
+            {
+                CRsc = CRhc;
+                CRsp = CRhp;
+            }
+        }
+
+        private void ExpCT(out String CTCod, out String CTPlace, String CTTrue, String CTFalse)
+        {
+            String Lb = this.GeraLabel();
+            String CUhTrue = Lb;
+            String CUhFalse = CTFalse;
+
+            String CFCod, CFPlace, CUhc, CUhp;
+
+            this.ExpCF(out CFCod, out CFPlace, CTTrue, CTFalse);
+            CUhc = CFCod;
+            CUhp = CFPlace;
+
+            String CUsc, CUsp;
+            this.ExpCU(CUhc, CUhp, out CUsc, out CUsp, CUhTrue, CUhFalse, Lb);
+            CTCod = CUsc;
+            CTPlace = CUsp;
+
+            if (CUhp == CUsp)
+            {
+                CTCod += Lb + ": goto " + CTTrue + Environment.NewLine;
+            }
+
+            LineManager.Instance.ResetToLastPos();
+        }
+
+        private void ExpCU(String CUhc, String CUhp, out String CUsc, out String CUsp, String CUhTrue, String CUhFalse, String CULb)
+        {
+            AnalisadorLexico.Analisar();
+            Int32 opType = TokenManager.Instance.TokenCode;
+            String opTk = TokenManager.Instance.TokenSymbol;
+
+            if (opType == LexMap.Consts["E"])
+            {
+                String Lb = this.GeraLabel();
+                String CFTrue = Lb;
+                String CFFalse = CUhFalse;
+
+                String CFCod, CFPlace, CU1hc, CU1hp;
+                this.ExpCF(out CFCod, out CFPlace, CFTrue, CFFalse);
+                CU1hp = "";
+                CU1hc = CUhc + CULb + ": " + CFCod;
+
+                String CU1sc, CU1sp;
+                String CU1hTrue = CUhTrue, CU1hFalse = CUhFalse;
+                this.ExpCR(CU1hc, CU1hp, out CU1sc, out CU1sp, CU1hTrue, CU1hFalse, Lb);
+                CUsc = CU1sc;
+                CUsp = CU1sp;
+            }
+            else
+            {
+                CUsc = CUhc;
+                CUsp = CUhp;
+            }
+        }
+
+        private void ExpCF(out String CFCod, out String CFPlace, String CFTrue, String CFFalse)
+        {
+            String CGCod, CGPlace;
+            this.ExpCG(out CGCod, out CGPlace, CFTrue, CFFalse);
+            CFCod = CGCod;
+            CFPlace = CGPlace;
+        }
+
+        private void ExpCG(out String CGCod, out String CGPlace, String CGTrue, String CGFalse)
+        {
+            AnalisadorLexico.Analisar();
+            if (TokenManager.Instance.TokenCode == LexMap.Consts["NAO"])
+            {
+                String CG1Cod, CG1Place;
+                this.ExpCG(out CG1Cod, out CG1Place, CGFalse, CGTrue);
+                CGPlace = this.CriaTemp();
+                CGCod = CG1Cod + CGPlace + " = !" + CG1Place + Environment.NewLine;
+            }
+            else
+            {
+                LineManager.Instance.ResetToLastPos();
+
+                String CH1Cod, CH1Place;
+                this.ExpCH(out CH1Cod, out CH1Place, CGTrue, CGFalse);
+                CGCod = CH1Cod;
+                CGPlace = CH1Place;
+
+                AnalisadorLexico.Analisar();
+                Int32 opType = TokenManager.Instance.TokenCode;
+                String opTk = TokenManager.Instance.TokenSymbol;
+                bool is_valid_flag = false;
+
+                if (opType == LexMap.Consts["MAIOR"])
+                {
+                    is_valid_flag = true;
+                }
+                if (opType == LexMap.Consts["IGUAL"])
+                {
+                    is_valid_flag = true;
+                }
+                if (opType == LexMap.Consts["MENOR"])
+                {
+                    is_valid_flag = true;
+                }
+                if (opType == LexMap.Consts["MAIORIGUAL"])
+                {
+                    is_valid_flag = true;
+                }
+                if (opType == LexMap.Consts["DIFERENTE"])
+                {
+                    is_valid_flag = true;
+                }
+                if (opType == LexMap.Consts["MENORIGUAL"])
+                {
+                    is_valid_flag = true;
+                }
+                if (is_valid_flag)
+                {
+                    String CH2Cod, CH2Place;
+                    this.ExpCH(out CH2Cod, out CH2Place, null, null);
+                    CGPlace = this.CriaTemp();
+                    CGCod += CH2Cod + CGPlace + " = " + CH1Place + " " + opTk + " " + CH2Place + Environment.NewLine
+                        + "if " + CGPlace + " != 0 goto " + CGTrue + Environment.NewLine
+                        + "goto " + CGFalse + Environment.NewLine;
+                }
+
+                LineManager.Instance.ResetToLastPos();
+            }
+        }
+
+        private void ExpCH(out String CHCod, out String CHPlace, String CHTrue, String CHFalse)
+        {
+            String CJCod, CJPlace, CXhc, CXhp;
+            this.ExpCJ(out CJCod, out CJPlace, CHTrue, CHFalse);
+            CXhc = CJCod;
+            CXhp = CJPlace;
+            
+            String CXsc, CXsp;
+            this.ExpCX(CXhc, CXhp, out CXsc, out CXsp);
+            CHCod = CXsc;
+            CHPlace = CXsp;
+
+            if(CHTrue != null && CXhp != CXsp){
+                CHCod += "if " + CHPlace + " != 0 goto " + CHTrue + Environment.NewLine
+                    + "goto " + CHFalse + Environment.NewLine;
+            }
+
+            LineManager.Instance.ResetToLastPos();
+        }
+
+        public void ExpCX(String CXhc, String CXhp, out String CXsc, out String CXsp)
+        {
+            AnalisadorLexico.Analisar();
+            Int32 opType = TokenManager.Instance.TokenCode;
+            String opTk = TokenManager.Instance.TokenSymbol;
+            bool is_valid_flag = false;
+
+            if (opType == LexMap.Consts["MAIS"])
+            {
+                is_valid_flag = true;
+            }
+            if (opType == LexMap.Consts["MENOS"])
+            {
+                is_valid_flag = true;
+            }
+            if (is_valid_flag)
+            {
+                String CJCod, CJPlace, CX1hc, CX1hp;
+                this.ExpCJ(out CJCod, out CJPlace, null, null);
+                CX1hp = this.CriaTemp();
+                CX1hc = CXhc + CJCod + CX1hp + " = " + CXhp + " " + opTk + " " + CJPlace + Environment.NewLine;
+                
+                String CX1sc, CX1sp;
+                this.ExpCX(CX1hc, CX1hp, out CX1sc, out CX1sp);
+                CXsc = CX1sc;
+                CXsp = CX1sp;
+            }
+            else
+            {
+                CXsp = CXhp;
+                CXsc = CXhc;
+            }
+        }
+
+        public void ExpCJ(out String CJCod, out String CJPlace, String CJTrue, String CJFalse)
+        {
+            String CKCod, CKPlace, CYhc, CYhp;
+            this.ExpCK(out CKCod, out CKPlace, CJTrue, CJFalse);
+            CYhc = CKCod;
+            CYhp = CKPlace;
+
+            String CYsc, CYsp;
+            this.ExpCY(CYhc, CYhp, out CYsc, out CYsp);
+            CJCod = CYsc;
+            CJPlace = CYsp;
+
+            if (CJTrue != null && CYhp != CYsp)
+            {
+                CJCod += "if " + CJPlace + " != 0 goto " + CJTrue + Environment.NewLine
+                    + "goto " + CJFalse + Environment.NewLine;
+            }
+
+            LineManager.Instance.ResetToLastPos();
+        }
+
+        public void ExpCY(String CYhc, String CYhp, out String CYsc, out String CYsp)
+        {
+            AnalisadorLexico.Analisar();
+            Int32 opType = TokenManager.Instance.TokenCode;
+            String opTk = TokenManager.Instance.TokenSymbol;
+            bool is_valid_flag = false;
+
+            if (opType == LexMap.Consts["MULTIPLICACAO"])
+            {
+                is_valid_flag = true;
+            }
+            if (opType == LexMap.Consts["DIVISAO"])
+            {
+                is_valid_flag = true;
+            }
+            if (opType == LexMap.Consts["MODC"])
+            {
+                is_valid_flag = true;
+            }
+            if (is_valid_flag)
+            {
+                String CKCod, CKPlace, CY1hc, CY1hp;
+                this.ExpCK(out CKCod, out CKPlace, null, null);
+                CY1hp = this.CriaTemp();
+                CY1hc = CYhc + CKCod + CY1hp + " = " + CYhp + " " + opTk + " " + CKPlace + Environment.NewLine;
+                
+                String CY1sc, CY1sp;
+                this.ExpCY(CY1hc, CY1hp, out CY1sc, out CY1sp);
+                CYsc = CY1sc;
+                CYsp = CY1sp;
+            }
+            else
+            {
+                CYsp = CYhp;
+                CYsc = CYhc;
+            }
+        }
+
+        public void ExpCK(out String CKCod, out String CKPlace, String CKTrue, String CKFalse)
+        {
+            CKCod = "";
+            CKPlace = "";
+            AnalisadorLexico.Analisar();
+            int tkc = TokenManager.Instance.TokenCode;
+            String tk = TokenManager.Instance.TokenSymbol;
+
+            if (tkc == LexMap.Consts["CONSTINTEIRO"] ||
+                tkc == LexMap.Consts["CONSTFLOAT"] ||
+                tkc == LexMap.Consts["CONSTFLOATPONTO"] ||
+                tkc == LexMap.Consts["CONSTFLOATPONTONUM"] ||
+                tkc == LexMap.Consts["CONSTFLOATNUME"] ||
+                tkc == LexMap.Consts["CONSTFLOATNUMPONTO"] ||
+                tkc == LexMap.Consts["CONSTFLOATE"] ||
+                tkc == LexMap.Consts["TRUE"] ||
+                tkc == LexMap.Consts["FALSE"] ||
+                tkc == LexMap.Consts["HIGH"] ||
+                tkc == LexMap.Consts["LOW"] ||
+                tkc == LexMap.Consts["INPUT"] ||
+                tkc == LexMap.Consts["OUTPUT"] ||
+                tkc == LexMap.Consts["ID"])
+            {
+                if (tkc == LexMap.Consts["ID"])
+                {
+                    AnalisadorLexico.Analisar();
+                    if (TokenManager.Instance.TokenCode == LexMap.Consts["ABREPAR"] || TokenManager.Instance.TokenCode == LexMap.Consts["PONTO"])
+                    {
+                        //falta fazer
+                        this.Funcao(tk);
+                    }
+                    else
+                    {
+                        LineManager.Instance.ResetToLastPos();
+
+                        TableSymbol.Instance.ExistsVar(tk);
+
+                        CKPlace = tk;
+                        if (TableSymbol.Instance.GetType(tk) == LexMap.Consts["LOGICO"])
+                        {
+                            CKCod = "if " + CKPlace + " == true goto " + CKTrue + Environment.NewLine
+                                + "goto " + CKFalse + Environment.NewLine;
+                        }
+                    }
+                }
+                else if (tkc == LexMap.Consts["CONSTINTEIRO"])
+                {
+                    CKPlace = this.CriaTemp();
+                    CKCod = CKPlace + " = " + tk + Environment.NewLine;
+                    if(CKTrue != null){
+                        CKCod += "if " + CKPlace + " != 0 goto " + CKTrue + Environment.NewLine
+                                + "goto " + CKFalse + Environment.NewLine;
+                    }
+                }
+                else if (tkc == LexMap.Consts["CONSTFLOAT"])
+                {
+                    CKPlace = this.CriaTemp();
+                    CKCod = CKPlace + " = " + tk + Environment.NewLine;
+                    if (CKTrue != null)
+                    {
+                        CKCod += "if " + CKPlace + " != 0 goto " + CKTrue + Environment.NewLine
+                                + "goto " + CKFalse + Environment.NewLine;
+                    }
+                }
+                else if (tkc == LexMap.Consts["TRUE"] || tkc == LexMap.Consts["FALSE"])
+                {
+                    CKPlace = this.CriaTemp();
+                    CKCod = CKPlace + " = " + tk + Environment.NewLine;
+                    if (tkc == LexMap.Consts["TRUE"])
+                    {
+                        CKCod += "goto " + CKTrue + Environment.NewLine;
+                    }
+                    else if (tkc == LexMap.Consts["FALSE"])
+                    {
+                        CKCod += "goto " + CKFalse + Environment.NewLine;
+                    }
+                }
+
+                return;
+            }
+
+            if (TokenManager.Instance.TokenCode == LexMap.Consts["ABREPAR"])
+            {
+                String ExpCod, ExpPlace;
+                this.ExpCond(out ExpCod, out ExpPlace, CKTrue, CKFalse);
+                CKCod = CKCod + ExpCod;
+                CKPlace = ExpPlace;
+
+                if (TokenManager.Instance.TokenCode != LexMap.Consts["FECHAPAR"])
+                {
+                    throw new AnalisadorException(
+                       String.Format("Era esperado o token {0}", LexMap.TokenGetNome(LexMap.Consts["FECHAPAR"]))
+                    );
+                }
+
+                return;
+            }
+
+            throw new AnalisadorException("O valor da expressão (CK) não é válido");
+        }
 
         #endregion ExpressaoCondicional
 
@@ -985,19 +1359,19 @@ namespace CompiladorArduino
             IfCod = "";
             if (TokenManager.Instance.TokenCode == LexMap.Consts["IF"])
             {
-                String LIf = this.GeraLabel();
-                String LElse = this.GeraLabel();
-                String LFim = this.GeraLabel();
-
                 AnalisadorLexico.Analisar();
                 if (TokenManager.Instance.TokenCode != LexMap.Consts["ABREPAR"])
                 {
                     throw new AnalisadorException("O token ( era esperado");
                 }
 
+                String LIf = this.GeraLabel();
+                String LElse = this.GeraLabel();
+                String LFim = this.GeraLabel();
+
                 String ExpCod, ExpPlace;
                 this.ExpCond(out ExpCod, out ExpPlace, LIf, LElse);
-
+                IfCod += ExpCod;
                 
                 if (TokenManager.Instance.TokenCode != LexMap.Consts["FECHAPAR"])
                 {
@@ -1010,9 +1384,13 @@ namespace CompiladorArduino
                     throw new AnalisadorException("O token { era esperado");
                 }
 
+                IfCod += LIf + ": ";
+
                 String LCCod;
                 this.ListaComandos(out LCCod);
+                IfCod += LCCod;
 
+                IfCod += "goto " + LFim + Environment.NewLine;
 
                 if (TokenManager.Instance.TokenCode != LexMap.Consts["FECHACHAVES"])
                 {
@@ -1020,12 +1398,12 @@ namespace CompiladorArduino
                 }
 
                 String IfEndCod;
-                this.IfEnd(out IfEndCod, LElse);
+                this.IfEnd(out IfEndCod, LElse, LFim);
                 IfCod += IfEndCod;
             }
         }
 
-        private void IfEnd(out String IfEndCod, String LElse)
+        private void IfEnd(out String IfEndCod, String LElse, String LFim)
         {
             IfEndCod = "";
             AnalisadorLexico.Analisar();
@@ -1054,9 +1432,12 @@ namespace CompiladorArduino
 	                // case 
                     // }
                     IfEndCod += LElse + ": ";
+
                     String IfCod;
                     this.If(out IfCod);
                     IfEndCod += IfCod;
+
+                    IfEndCod += "goto " + LFim + Environment.NewLine;
                 }
                 else
                 {
@@ -1081,8 +1462,11 @@ namespace CompiladorArduino
                     throw new AnalisadorException("O token ( era esperado");
                 }
 
+                String LWhile = this.GeraLabel();
+                String LFim = this.GeraLabel();
+
                 String ExpCod, ExpPlace;
-                this.ExpCond(out ExpCod, out ExpPlace);
+                this.ExpCond(out ExpCod, out ExpPlace, LWhile, LFim);
 
                 if (TokenManager.Instance.TokenCode != LexMap.Consts["FECHAPAR"])
                 {
@@ -1109,6 +1493,9 @@ namespace CompiladorArduino
         {
             if (TokenManager.Instance.TokenCode == LexMap.Consts["DO"])
             {
+                String LDoWhile = this.GeraLabel();
+                String LFim = this.GeraLabel();
+
                 AnalisadorLexico.Analisar();
                 if (TokenManager.Instance.TokenCode != LexMap.Consts["ABRECHAVES"])
                 {
@@ -1136,7 +1523,7 @@ namespace CompiladorArduino
                 }
 
                 String ExpCod, ExpPlace;
-                this.ExpCond(out ExpCod, out ExpPlace);
+                this.ExpCond(out ExpCod, out ExpPlace, LDoWhile, LFim);
 
                 if (TokenManager.Instance.TokenCode != LexMap.Consts["FECHAPAR"])
                 {
@@ -1167,8 +1554,11 @@ namespace CompiladorArduino
                     throw new AnalisadorException("O token ; era esperado");
                 }
 
+                String LFor = this.GeraLabel();
+                String LFim = this.GeraLabel();
+
                 String ExpCod, ExpPlace;
-                this.ExpCond(out ExpCod, out ExpPlace);
+                this.ExpCond(out ExpCod, out ExpPlace, LFor, LFim);
 
                 if (TokenManager.Instance.TokenCode != LexMap.Consts["PONTOVIRGULA"])
                 {
@@ -1295,6 +1685,14 @@ namespace CompiladorArduino
         {
             String res = "T" + this.nTemp;
             this.nTemp++;
+            return res;
+        }
+
+        private int nLabel;
+        private String GeraLabel()
+        {
+            String res = "L" + this.nLabel;
+            this.nLabel++;
             return res;
         }
 

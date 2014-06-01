@@ -39,20 +39,10 @@ namespace InterfaceGrafica
             fctb.ClearUndo();
             fctb.Text = @"
 int i, j;
-float a, b;
-long c;
-bool d;
 
-i = j + a * b;
-j -= i - (2 * i);
-i = 1 + 2 - (5 - 7 * (5 / 8)) + 3;
+if(true){
 
-i = (1 || 2) + 1;
-d = 1 && 0 + 1;
-
-d = 1 || 2 * 3;
-d = 4 * 1 || 2;
-d = 3 > 1 > 2;
+}
 
 int end, fim;
 end = fim;
