@@ -71,7 +71,8 @@ namespace CompiladorArduino
             {"SWITCH", 84},
             {"CASE", 85},
             {"BREAK", 86},
-            {"DEFAULT", 87}
+            {"DEFAULT", 87},
+            {"CONTINUE", 88}
         };
 
         public static Dictionary<String, Int32> PalavraReservada = new Dictionary<String, Int32>()
@@ -86,6 +87,7 @@ namespace CompiladorArduino
             {"case", 85},
             {"break", 86},
             {"default", 87},
+            {"continue", 88},
             {"if", 66},
             {"else", 68},
             {"for", 70},
@@ -160,7 +162,8 @@ namespace CompiladorArduino
             {84, "Tk_Switch"},
             {85, "Tk_Case"},
             {86, "Tk_Break"},
-            {87, "Tk_Default"}
+            {87, "Tk_Default"},
+            {88, "Tk_Continue"}
         };
 
         public static List<char> Letras = new List<char>()

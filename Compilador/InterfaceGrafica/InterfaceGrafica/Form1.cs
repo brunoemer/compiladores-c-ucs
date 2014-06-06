@@ -37,16 +37,15 @@ namespace InterfaceGrafica
             fctb.DoCaretVisible();
             fctb.IsChanged = false;
             fctb.ClearUndo();
-            fctb.Text = @"
-int i, j;
+            fctb.Text = @"int i, j;
 
-if(false || true){
-    i = j;
+while(true){
+    i=0;
 }
+
 
 int end, fim;
 end = fim;
-
 ";
 
 

@@ -191,36 +191,34 @@ CK ->
 				if(CK.true != null) CK.cod = gen("if ", CK.place, "!= 0 goto", CK.true) || gen("goto", CK.false); }
 	ctefloat |{ CK.place = criatemp(); CK.cod = gen(=, CK.place, cte.val);
 				if(CK.true != null) CK.cod = gen("if ", CK.place, "!= 0 goto", CK.true) || gen("goto", CK.false); }
-	ctebool | { CK.place = criatemp(); CK.cod = gen(=, CK.place, cte.val);
-				if(CK.true != null){ if (cte.val == true) CK.cod = gen("goto", CK.true); else CK.cod = gen("goto", CK.false); } }
+	ctebool | { if(CK.true != null){ if (cte.val == true) CK.cod = gen("goto", CK.true); else CK.cod = gen("goto", CK.false); } }
 	Funcao // ver
 
---falta short circuit nos loops
 While ->
-	while { LIni = geralabel(); LFim = geralabel(); } ( ExpCond ) {{ { LoopCom.LIni = LIni; LoopCom.LFim = LFim } LoopCom }} 
-		{ While.cod = gen(LIni, ':') || ExpCond.cod || gen("if", ExpCond.place, "= 0", "goto", LFim) 
-		|| LoopCom.cod || gen("goto", LIni) || gen(LFim, ':') }
+	while { LIni = geralabel(); LLoop = geralabel(); LFim = geralabel(); ExpCond.true = LIni; ExpCond.false = LFim } ( ExpCond ) 
+		{{ { ComandosLoop.LIni = LLoop; ComandosLoop.LFim = LFim } ComandosLoop }} 
+		{ While.cod = gen(LLoop, ':') || ExpCond.cod	|| gen(LIni, ':') || ComandosLoop.cod || gen("goto", LLoop) || gen(LFim, ':') }
 
 DoWhile ->
-	do {{ { LIni = geralabel(); LFim = geralabel(); LoopCom.LIni = LIni; LoopCom.LFim = LFim } LoopCom }} while ( ExpCond ); 
-		{ DoWhile.cod = gen(LIni, ':') || LoopCom.cod || ExpCond.cod || gen("if", ExpCond.place, "= 0", "goto", LFim)
-		|| gen("goto", LIni) || gen(LFim, ':') }
+	do {{ { LIni = geralabel(); LFim = geralabel(); ComandosLoop.LIni = LIni; ComandosLoop.LFim = LFim } ComandosLoop }} while 
+		( { ExpCond.true = LIni; ExpCond.false = LFim } ExpCond ); 
+		{ DoWhile.cod = gen(LIni, ':') || ComandosLoop.cod || ExpCond.cod || gen("goto", LIni) || gen(LFim, ':') }
 
 For ->
-	for { LIni = geralabel(); LFim = geralabel(); } ( ListaAtrib1; ExpCond; ListaAtrib2 ) 
-		{{ { LoopCom.LIni = LIni; LoopCom.LFim = LFim } LoopCom }}
-		{ For.cod = ListaAtrib1.cod || gen(LIni, ':') || ExpCond.cod || gen("if", ExpCond.place, "= 0", "goto", LFim)
-		|| LoopCom.cod || ListaAtrib2.cod || gen("goto", LIni) || gen(LFim, ':') }
+	for { LIni = geralabel(); LFim = geralabel(); ExpCond.true = LIni; ExpCond.false = LFim } ( ListaAtrib1; ExpCond; ListaAtrib2 ) 
+		{{ { ComandosLoop.LIni = LIni; ComandosLoop.LFim = LFim } ComandosLoop }}
+		{ For.cod = ListaAtrib1.cod || gen(LIni, ':') || ExpCond.cod || ComandosLoop.cod || ListaAtrib2.cod || gen("goto", LIni) || gen(LFim, ':') }
 ListaAtrib ->
 	Atribuicao ListaAtribA { ListaAtrib.cod = Atribuicao.cod || ListaAtribA.cod }
 ListaAtribA ->
 	, Atribuicao ListaAtribA | { ListaAtribA.cod = gen(',') || Atribuicao.cod || ListaAtribA.cod }
 	"" { ListaAtribA.cod = "" }
 
-LoopCom ->
-	break | { LoopCom.cod = gen("goto", LoopCom.LFim) }
-	continue | { LoopCom.cod = gen("goto", LoopCom.LIni) }
-	ListaComandos { LoopCom.cod = ListaComandos.cod }
+ComandosLoop ->
+	break; | { ComandosLoop.cod = gen("goto", ComandosLoop.LFim) }
+	continue; | { ComandosLoop.cod = gen("goto", ComandosLoop.LIni) }
+	ListaComandos | { ComandosLoop.cod = ListaComandos.cod }
+	ComandosLoop1 { ComandosLoop.cod = ComandosLoop1.cod }
 
 Funcao ->
 	id ( { TableSymbol.ExistsFunction(id.cod) } ListaParam );
