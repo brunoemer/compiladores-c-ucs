@@ -10,7 +10,6 @@ ListaComandosGlobal ->
 	While |
 	DoWhile |
 	For |
-	Switch |
 	Atribuicao |
 	Funcao |
 	ListaComandosGlobal
@@ -21,7 +20,6 @@ ListaComandos ->
 	While |
 	DoWhile |
 	For |
-	Switch |
 	Atribuicao |
 	Funcao |
 	ListaComandos1
@@ -197,17 +195,18 @@ CK ->
 While ->
 	while { LIni = geralabel(); LLoop = geralabel(); LFim = geralabel(); ExpCond.true = LIni; ExpCond.false = LFim } ( ExpCond ) 
 		{{ { ComandosLoop.LIni = LLoop; ComandosLoop.LFim = LFim } ComandosLoop }} 
-		{ While.cod = gen(LLoop, ':') || ExpCond.cod	|| gen(LIni, ':') || ComandosLoop.cod || gen("goto", LLoop) || gen(LFim, ':') }
+		{ While.cod = gen(LLoop, ':') || ExpCond.cod || gen(LIni, ':') || ComandosLoop.cod || gen("goto", LLoop) || gen(LFim, ':') }
 
 DoWhile ->
 	do {{ { LIni = geralabel(); LFim = geralabel(); ComandosLoop.LIni = LIni; ComandosLoop.LFim = LFim } ComandosLoop }} while 
 		( { ExpCond.true = LIni; ExpCond.false = LFim } ExpCond ); 
-		{ DoWhile.cod = gen(LIni, ':') || ComandosLoop.cod || ExpCond.cod || gen("goto", LIni) || gen(LFim, ':') }
+		{ DoWhile.cod = gen(LIni, ':') || ComandosLoop.cod || ExpCond.cod || gen(LFim, ':') }
 
 For ->
-	for { LIni = geralabel(); LFim = geralabel(); ExpCond.true = LIni; ExpCond.false = LFim } ( ListaAtrib1; ExpCond; ListaAtrib2 ) 
-		{{ { ComandosLoop.LIni = LIni; ComandosLoop.LFim = LFim } ComandosLoop }}
-		{ For.cod = ListaAtrib1.cod || gen(LIni, ':') || ExpCond.cod || ComandosLoop.cod || ListaAtrib2.cod || gen("goto", LIni) || gen(LFim, ':') }
+	for { LIni = geralabel(); LLoop = geralabel(); LFim = geralabel(); ExpCond.true = LIni; ExpCond.false = LFim } ( ListaAtrib1; ExpCond; ListaAtrib2 ) 
+		{{ { ComandosLoop.LIni = LLoop; ComandosLoop.LFim = LFim } ComandosLoop }}
+		{ For.cod = ListaAtrib1.cod || gen(LLoop, ':') || ExpCond.cod || gen(LIni, ':') || 
+			ComandosLoop.cod || ListaAtrib2.cod || gen("goto", LLoop) || gen(LFim, ':') }
 ListaAtrib ->
 	Atribuicao ListaAtribA { ListaAtrib.cod = Atribuicao.cod || ListaAtribA.cod }
 ListaAtribA ->
@@ -215,10 +214,24 @@ ListaAtribA ->
 	"" { ListaAtribA.cod = "" }
 
 ComandosLoop ->
+	ListaComandos | { ComandosLoop.cod = ListaComandos.cod }
 	break; | { ComandosLoop.cod = gen("goto", ComandosLoop.LFim) }
 	continue; | { ComandosLoop.cod = gen("goto", ComandosLoop.LIni) }
-	ListaComandos | { ComandosLoop.cod = ListaComandos.cod }
 	ComandosLoop1 { ComandosLoop.cod = ComandosLoop1.cod }
+
+	//ver
+	DeclaraVar |
+	If |
+	While |
+	DoWhile |
+	For |
+	Atribuicao |
+	Funcao |
+	break; | { ComandosLoop.cod = gen("goto", ComandosLoop.LFim) }
+	continue; | { ComandosLoop.cod = gen("goto", ComandosLoop.LIni) }
+	ComandosLoop1 { ComandosLoop.cod = ComandosLoop1.cod }
+
+//passar flag para if poder usar ComandosLoop qnd estiver dentro de loops
 
 Funcao ->
 	id ( { TableSymbol.ExistsFunction(id.cod) } ListaParam );

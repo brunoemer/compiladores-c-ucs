@@ -39,10 +39,9 @@ namespace InterfaceGrafica
             fctb.ClearUndo();
             fctb.Text = @"int i, j;
 
-while(true){
-    i=0;
+for(i = 0; i < 10; i=i+1){
+    j = 1;
 }
-
 
 int end, fim;
 end = fim;
