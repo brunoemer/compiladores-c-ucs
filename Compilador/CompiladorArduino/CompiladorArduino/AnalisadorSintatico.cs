@@ -134,7 +134,7 @@ namespace CompiladorArduino
             LCCod = LCCod1;
         }
 
-        private void ListaComandos(out String LCCod, String LIni, String LFim)
+        private void ListaComandos(out String LCCod, String LDesvioIni, String LDesvioFim)
         {
             LCCod = "";
             bool recur_flag = false;
@@ -156,7 +156,7 @@ namespace CompiladorArduino
             if (TokenManager.Instance.TokenCode == LexMap.Consts["IF"])
             {
                 String IfCod;
-                this.If(out IfCod);
+                this.If(out IfCod, LDesvioIni, LDesvioFim);
                 LCCod += IfCod;
                 recur_flag = true;
             } else
@@ -191,10 +191,10 @@ namespace CompiladorArduino
             //loops desvios
             if (TokenManager.Instance.TokenCode == LexMap.Consts["BREAK"] || TokenManager.Instance.TokenCode == LexMap.Consts["CONTINUE"])
             {
-                if (LIni != null || LFim != null)
+                if (LDesvioIni != null || LDesvioFim != null)
                 {
                     String CLDCod;
-                    this.ComandosLoopDesvio(out CLDCod, LIni, LFim);
+                    this.ComandosLoopDesvio(out CLDCod, LDesvioIni, LDesvioFim);
                     LCCod += CLDCod;
                     recur_flag = true;
                 }
@@ -228,7 +228,7 @@ namespace CompiladorArduino
             if (recur_flag == true)
             {
                 String LC1Cod;
-                this.ListaComandos(out LC1Cod);
+                this.ListaComandos(out LC1Cod, LDesvioIni, LDesvioFim);
                 LCCod += LC1Cod;
             }
         }
@@ -1366,6 +1366,13 @@ namespace CompiladorArduino
 
         private void If(out String IfCod)
         {
+            String IfCod1;
+            this.If(out IfCod1, null, null);
+            IfCod = IfCod1;
+        }
+
+        private void If(out String IfCod, String LDesvioIni, String LDesvioFim)
+        {
             IfCod = "";
             if (TokenManager.Instance.TokenCode == LexMap.Consts["IF"])
             {
@@ -1397,7 +1404,7 @@ namespace CompiladorArduino
                 IfCod += LIf + ": ";
 
                 String LCCod;
-                this.ListaComandos(out LCCod);
+                this.ListaComandos(out LCCod, LDesvioIni, LDesvioFim);
                 IfCod += LCCod;
 
                 IfCod += "goto " + LFim + Environment.NewLine;
@@ -1408,14 +1415,14 @@ namespace CompiladorArduino
                 }
 
                 String IfEndCod;
-                this.IfEnd(out IfEndCod, LElse, LFim);
+                this.IfEnd(out IfEndCod, LElse, LFim, LDesvioIni, LDesvioFim);
                 IfCod += IfEndCod;
 
                 IfCod += LFim + ": ";
             }
         }
 
-        private void IfEnd(out String IfEndCod, String LElse, String LFim)
+        private void IfEnd(out String IfEndCod, String LElse, String LFim, String LDesvioIni, String LDesvioFim)
         {
             IfEndCod = "";
             AnalisadorLexico.Analisar();
@@ -1426,7 +1433,7 @@ namespace CompiladorArduino
                 {
                     IfEndCod += LElse + ": ";
                     String LCCod;
-                    this.ListaComandos(out LCCod);
+                    this.ListaComandos(out LCCod, LDesvioIni, LDesvioFim);
                     IfEndCod += LCCod;
 
                     if (TokenManager.Instance.TokenCode != LexMap.Consts["FECHACHAVES"])
@@ -1439,7 +1446,7 @@ namespace CompiladorArduino
                     IfEndCod += LElse + ": ";
 
                     String IfCod;
-                    this.If(out IfCod);
+                    this.If(out IfCod, LDesvioIni, LDesvioFim);
                     IfEndCod += IfCod;
 
                     IfEndCod += "goto " + LFim + Environment.NewLine;
@@ -1662,45 +1669,17 @@ namespace CompiladorArduino
         private void ComandosLoop(out String CLCod, String LIni, String LFim)
         {
             CLCod = "";
-            //bool recur_flag = false;
 
             String LCCod;
             this.ListaComandos(out LCCod, LIni, LFim);
             CLCod += LCCod;
 
-            //if (TokenManager.Instance.TokenCode == LexMap.Consts["BREAK"])
+            //if (LCCod == "")
             //{
-            //    CLCod += "goto " + LFim + Environment.NewLine;
-
-            //    AnalisadorLexico.Analisar();
-            //    if (TokenManager.Instance.TokenCode != LexMap.Consts["PONTOVIRGULA"])
-            //    {
-            //        throw new AnalisadorException("O token ; era esperado");
-            //    }
-            //    recur_flag = true;
+                //String CLCod1;
+                //this.ComandosLoop(out CLCod1, LIni, LFim);
+                //CLCod += CLCod1;
             //}
-            //else if (TokenManager.Instance.TokenCode == LexMap.Consts["CONTINUE"])
-            //{
-            //    CLCod += "goto " + LIni + Environment.NewLine;
-
-            //    AnalisadorLexico.Analisar();
-            //    if (TokenManager.Instance.TokenCode != LexMap.Consts["PONTOVIRGULA"])
-            //    {
-            //        throw new AnalisadorException("O token ; era esperado");
-            //    }
-            //    recur_flag = true;
-            //}
-
-            String CLDCod;
-            this.ComandosLoopDesvio(out CLDCod, LIni, LFim);
-            CLCod += CLDCod;
-
-            if (CLDCod != "")
-            {
-                String CLCod1;
-                this.ComandosLoop(out CLCod1, LIni, LFim);
-                CLCod += CLCod1;
-            }
         }
 
         private void ComandosLoopDesvio(out String CLDCod, String LIni, String LFim)

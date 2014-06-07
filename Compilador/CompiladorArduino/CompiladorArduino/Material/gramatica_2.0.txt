@@ -16,14 +16,14 @@ ListaComandosGlobal ->
 
 ListaComandos ->
 	DeclaraVar |
-	If | { ListaComandos.cod = If.cod }
+	{ If.LDesvioIni = ListaComandos.LDesvioIni; If.LDesvioFim = ListaComandos.LDesvioFim } If | { ListaComandos.cod = If.cod }
 	While | { ListaComandos.cod = While.cod }
 	DoWhile | { ListaComandos.cod = DoWhile.cod }
 	For | { ListaComandos.cod = For.cod }
 	Atribuicao | { ListaComandos.cod = Atribuicao.cod }
-	ComandosLoopDesvio | { ComandosLoopDesvio.LIni = ListaComandos.LDesvioIni; ComandosLoopDesvio.LFim = ListaComandos.LDesvioFim }
+	{ ComandosLoopDesvio.LDesvioIni = ListaComandos.LDesvioIni; ComandosLoopDesvio.LDesvioFim = ListaComandos.LDesvioFim } ComandosLoopDesvio | { ListaComandos.cod = ComandosLoopDesvio.cod }
 	Funcao | // fazer
-	ListaComandos1 { ListaComandos.cod = ListaComandos1.cod }
+	{ ListaComandos1.LDesvioIni = ListaComandos.LDesvioIni; ListaComandos1.LDesvioFim = ListaComandos.LDesvioFim } ListaComandos1 { ListaComandos.cod = ListaComandos1.cod }
 
 Declaracao -> 
 	TipoVar id { DecB.tipo = TipoVar.tipo; DecB.idCod = id.cod; } DecB | 
@@ -127,10 +127,12 @@ K ->
 	
 If ->
 	if ( { LIf = geralabel(); LElse = geralabel(); LFim = geralabel(); ExpCond.true = LIf; ExpCond.false = LElse } ExpCond ) 
-		{{ ListaComandos }} { IfEnd.LElse = LElse; IfEnd.LFim = LFim } IfEnd { 
+		{{ { ListaComandos.LDesvioIni = If.LDesvioIni; ListaComandos.LDesvioFim = If.LDesvioFim } ListaComandos }}
+			{ IfEnd.LElse = LElse; IfEnd.LFim = LFim; IfEnd.LDesvioIni = If.LDesvioIni; IfEnd.LDesvioFim = If.LDesvioFim } IfEnd { 
 			If.cod = ExpCond.cod || gen(LIf, ':') || ListaComandos.cod || gen("goto", LFim) || IfEnd.cod || gen(LFim, ':') }
 IfEnd ->
-	else {{ ListaComandos }} | { IfEnd.cod = gen(IfEnd.LElse, ':') || ListaComandos.cod }
+	else {{ { ListaComandos.LDesvioIni = IfEnd.LDesvioIni; ListaComandos.LDesvioFim = IfEnd.LDesvioFim } ListaComandos }} | 
+		{ IfEnd.cod = gen(IfEnd.LElse, ':') || ListaComandos.cod }
 	else If | { IfEnd.cod = gen(IfEnd.LElse, ':') || If.cod || gen("goto", IfEnd.LFim) }
 	"" { IfEnd.cod = "" }
 
@@ -182,7 +184,8 @@ CY -> Ɛ { CY.sp = CY.hp; CY.sc = CY.hc }
 
 CK ->
 	id |    { CK.place = id.cod; CK.cod = ""; TableSymbol.Exists(id.cod);
-				if(CK.true != null && TableSymbol.getType(id.cod) == "bool") CK.cod = gen("if", CK.place, "== true goto", CK.true) || gen("goto", CK.false); }
+				if(CK.true != null && TableSymbol.getType(id.cod) == "bool") 
+				CK.cod = gen("if", CK.place, "== true goto", CK.true) || gen("goto", CK.false); }
 	(ExpCond) |   { CK.place = ExpCond.place; CK.cod = ExpCond.cod; ExpCond.true = CK.true; ExpCond.false = CK.false; }
 	cteint | { CK.place = criatemp(); CK.cod = gen(=, CK.place, cte.val);
 				if(CK.true != null) CK.cod = gen("if ", CK.place, "!= 0 goto", CK.true) || gen("goto", CK.false); }
@@ -215,16 +218,14 @@ ListaAtribA ->
 	"" { ListaAtribA.cod = "" }
 
 ComandosLoop ->
-	{ ListaComandos.LDesvioIni = ComandosLoop.LIni; ListaComandos.LDesvioFim = ComandosLoop.LFim } ListaComandos | { ComandosLoop.cod = ListaComandos.cod }
-	{ ComandosLoopDesvio.LIni = ComandosLoop.LIni; ComandosLoopDesvio.LFim = ComandosLoop.LFim } ComandosLoopDesvio { ComandosLoop.cod = ComandosLoopDesvio.cod }
+	{ ListaComandos.LDesvioIni = ComandosLoop.LIni; ListaComandos.LDesvioFim = ComandosLoop.LFim } ListaComandos | 
+		{ ComandosLoop.cod = ListaComandos.cod }
 	ComandosLoop1 { ComandosLoop.cod = ComandosLoop1.cod }
 
 ComandosLoopDesvio ->
 	break; | { if(ComandosLoopDesvio.LFim != null) ComandosLoopDesvio.cod = gen("goto", ComandosLoopDesvio.LFim) }
 	continue; | { if(ComandosLoopDesvio.LIni != null) ComandosLoopDesvio.cod = gen("goto", ComandosLoopDesvio.LIni) }
 	{} { ComandosLoopDesvio.cod = "" }
-
-//passar flag para if poder usar ComandosLoop qnd estiver dentro de loops
 
 Funcao ->
 	id ( { TableSymbol.ExistsFunction(id.cod) } ListaParam );
