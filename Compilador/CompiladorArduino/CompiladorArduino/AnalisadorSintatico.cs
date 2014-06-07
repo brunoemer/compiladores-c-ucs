@@ -95,14 +95,6 @@ namespace CompiladorArduino
             }
             else
 
-            //switch
-            if (TokenManager.Instance.TokenCode == LexMap.Consts["SWITCH"])
-            {
-                //this.Switch();
-                recur_flag = true;
-            }
-            else
-
             if (TokenManager.Instance.TokenCode == LexMap.Consts["ID"])
             {
                 String LIdCod = TokenManager.Instance.TokenSymbol;
@@ -136,6 +128,13 @@ namespace CompiladorArduino
         }
 
         private void ListaComandos(out String LCCod)
+        {
+            String LCCod1;
+            this.ListaComandos(out LCCod1, null, null);
+            LCCod = LCCod1;
+        }
+
+        private void ListaComandos(out String LCCod, String LIni, String LFim)
         {
             LCCod = "";
             bool recur_flag = false;
@@ -189,13 +188,19 @@ namespace CompiladorArduino
                 recur_flag = true;
             } else
 
-            //switch
-            if (TokenManager.Instance.TokenCode == LexMap.Consts["SWITCH"])
+            //loops desvios
+            if (TokenManager.Instance.TokenCode == LexMap.Consts["BREAK"] || TokenManager.Instance.TokenCode == LexMap.Consts["CONTINUE"])
             {
-                //this.Switch();
-                recur_flag = true;
-            } else
-            
+                if (LIni != null || LFim != null)
+                {
+                    String CLDCod;
+                    this.ComandosLoopDesvio(out CLDCod, LIni, LFim);
+                    LCCod += CLDCod;
+                    recur_flag = true;
+                }
+            }
+            else
+
             if (TokenManager.Instance.TokenCode == LexMap.Consts["ID"])
             {
                 String LIdCod = TokenManager.Instance.TokenSymbol;
@@ -1019,7 +1024,7 @@ namespace CompiladorArduino
                 CRsc = CRhc;
                 CRsp = CRhp;
 
-                CRsc += CRLb + ": goto(or) " + CRFalse + Environment.NewLine;
+                CRsc += CRLb + ": goto " + CRFalse + Environment.NewLine;
             }
         }
 
@@ -1071,7 +1076,7 @@ namespace CompiladorArduino
                 CUsc = CUhc;
                 CUsp = CUhp;
 
-                CUsc += CULb + ": goto(and) " + CUTrue + Environment.NewLine;
+                CUsc += CULb + ": goto " + CUTrue + Environment.NewLine;
             }
         }
 
@@ -1326,11 +1331,11 @@ namespace CompiladorArduino
                 {
                     if (tkc == LexMap.Consts["TRUE"])
                     {
-                        CKCod += "goto(true) " + CKTrue + Environment.NewLine;
+                        CKCod += "goto " + CKTrue + Environment.NewLine;
                     }
                     else if (tkc == LexMap.Consts["FALSE"])
                     {
-                        CKCod += "goto(false) " + CKFalse + Environment.NewLine;
+                        CKCod += "goto " + CKFalse + Environment.NewLine;
                     }
                 }
 
@@ -1657,40 +1662,69 @@ namespace CompiladorArduino
         private void ComandosLoop(out String CLCod, String LIni, String LFim)
         {
             CLCod = "";
-            bool recur_flag = false;
+            //bool recur_flag = false;
 
             String LCCod;
-            this.ListaComandos(out LCCod);
+            this.ListaComandos(out LCCod, LIni, LFim);
             CLCod += LCCod;
 
-            if (TokenManager.Instance.TokenCode == LexMap.Consts["BREAK"])
-            {
-                CLCod += "goto " + LFim + Environment.NewLine;
+            //if (TokenManager.Instance.TokenCode == LexMap.Consts["BREAK"])
+            //{
+            //    CLCod += "goto " + LFim + Environment.NewLine;
 
-                AnalisadorLexico.Analisar();
-                if (TokenManager.Instance.TokenCode != LexMap.Consts["PONTOVIRGULA"])
-                {
-                    throw new AnalisadorException("O token ; era esperado");
-                }
-                recur_flag = true;
-            }
-            else if (TokenManager.Instance.TokenCode == LexMap.Consts["CONTINUE"])
-            {
-                CLCod += "goto " + LIni + Environment.NewLine;
+            //    AnalisadorLexico.Analisar();
+            //    if (TokenManager.Instance.TokenCode != LexMap.Consts["PONTOVIRGULA"])
+            //    {
+            //        throw new AnalisadorException("O token ; era esperado");
+            //    }
+            //    recur_flag = true;
+            //}
+            //else if (TokenManager.Instance.TokenCode == LexMap.Consts["CONTINUE"])
+            //{
+            //    CLCod += "goto " + LIni + Environment.NewLine;
 
-                AnalisadorLexico.Analisar();
-                if (TokenManager.Instance.TokenCode != LexMap.Consts["PONTOVIRGULA"])
-                {
-                    throw new AnalisadorException("O token ; era esperado");
-                }
-                recur_flag = true;
-            }
+            //    AnalisadorLexico.Analisar();
+            //    if (TokenManager.Instance.TokenCode != LexMap.Consts["PONTOVIRGULA"])
+            //    {
+            //        throw new AnalisadorException("O token ; era esperado");
+            //    }
+            //    recur_flag = true;
+            //}
 
-            if (recur_flag)
+            String CLDCod;
+            this.ComandosLoopDesvio(out CLDCod, LIni, LFim);
+            CLCod += CLDCod;
+
+            if (CLDCod != "")
             {
                 String CLCod1;
                 this.ComandosLoop(out CLCod1, LIni, LFim);
                 CLCod += CLCod1;
+            }
+        }
+
+        private void ComandosLoopDesvio(out String CLDCod, String LIni, String LFim)
+        {
+            CLDCod = "";
+            if (TokenManager.Instance.TokenCode == LexMap.Consts["BREAK"] && LFim != null)
+            {
+                CLDCod += "goto " + LFim + Environment.NewLine;
+
+                AnalisadorLexico.Analisar();
+                if (TokenManager.Instance.TokenCode != LexMap.Consts["PONTOVIRGULA"])
+                {
+                    throw new AnalisadorException("O token ; era esperado");
+                }
+            }
+            else if (TokenManager.Instance.TokenCode == LexMap.Consts["CONTINUE"] && LIni != null)
+            {
+                CLDCod += "goto " + LIni + Environment.NewLine;
+
+                AnalisadorLexico.Analisar();
+                if (TokenManager.Instance.TokenCode != LexMap.Consts["PONTOVIRGULA"])
+                {
+                    throw new AnalisadorException("O token ; era esperado");
+                }
             }
         }
 

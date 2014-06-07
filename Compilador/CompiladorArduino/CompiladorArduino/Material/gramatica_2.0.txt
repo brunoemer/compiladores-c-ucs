@@ -1,28 +1,29 @@
 ﻿ProgArduino -> 
-	{ currentContext = GlobalContext } ListaProg
+	{ currentContext = GlobalContext } ListaProg { ProgArduino.cod = ListaProg.cod }
 
 ListaProg ->
-	ListaComandosGlobal
+	ListaComandosGlobal { ListaProg.cod = ListaComandosGlobal.cod }
 	
 ListaComandosGlobal ->
 	Declaracao |
-	If |
-	While |
-	DoWhile |
-	For |
-	Atribuicao |
-	Funcao |
-	ListaComandosGlobal
+	If | { ListaComandosGlobal.cod = If.cod }
+	While | { ListaComandosGlobal.cod = While.cod }
+	DoWhile | { ListaComandosGlobal.cod = DoWhile.cod }
+	For | { ListaComandosGlobal.cod = For.cod }
+	Atribuicao | { ListaComandosGlobal.cod = Atribuicao.cod }
+	Funcao | // fazer
+	ListaComandosGlobal1 { ListaComandosGlobal.cod = ListaComandosGlobal1.cod }
 
 ListaComandos ->
 	DeclaraVar |
-	If |
-	While |
-	DoWhile |
-	For |
-	Atribuicao |
-	Funcao |
-	ListaComandos1
+	If | { ListaComandos.cod = If.cod }
+	While | { ListaComandos.cod = While.cod }
+	DoWhile | { ListaComandos.cod = DoWhile.cod }
+	For | { ListaComandos.cod = For.cod }
+	Atribuicao | { ListaComandos.cod = Atribuicao.cod }
+	ComandosLoopDesvio | { ComandosLoopDesvio.LIni = ListaComandos.LDesvioIni; ComandosLoopDesvio.LFim = ListaComandos.LDesvioFim }
+	Funcao | // fazer
+	ListaComandos1 { ListaComandos.cod = ListaComandos1.cod }
 
 Declaracao -> 
 	TipoVar id { DecB.tipo = TipoVar.tipo; DecB.idCod = id.cod; } DecB | 
@@ -121,7 +122,7 @@ K ->
 	ctelong |  { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "long" }
 	ctefloat | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "float" }
 	ctebool | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "bool" }
-    Funcao // ver
+    Funcao // fazer
 
 	
 If ->
@@ -190,7 +191,7 @@ CK ->
 	ctefloat |{ CK.place = criatemp(); CK.cod = gen(=, CK.place, cte.val);
 				if(CK.true != null) CK.cod = gen("if ", CK.place, "!= 0 goto", CK.true) || gen("goto", CK.false); }
 	ctebool | { if(CK.true != null){ if (cte.val == true) CK.cod = gen("goto", CK.true); else CK.cod = gen("goto", CK.false); } }
-	Funcao // ver
+	Funcao // fazer
 
 While ->
 	while { LIni = geralabel(); LLoop = geralabel(); LFim = geralabel(); ExpCond.true = LIni; ExpCond.false = LFim } ( ExpCond ) 
@@ -214,22 +215,14 @@ ListaAtribA ->
 	"" { ListaAtribA.cod = "" }
 
 ComandosLoop ->
-	ListaComandos | { ComandosLoop.cod = ListaComandos.cod }
-	break; | { ComandosLoop.cod = gen("goto", ComandosLoop.LFim) }
-	continue; | { ComandosLoop.cod = gen("goto", ComandosLoop.LIni) }
+	{ ListaComandos.LDesvioIni = ComandosLoop.LIni; ListaComandos.LDesvioFim = ComandosLoop.LFim } ListaComandos | { ComandosLoop.cod = ListaComandos.cod }
+	{ ComandosLoopDesvio.LIni = ComandosLoop.LIni; ComandosLoopDesvio.LFim = ComandosLoop.LFim } ComandosLoopDesvio { ComandosLoop.cod = ComandosLoopDesvio.cod }
 	ComandosLoop1 { ComandosLoop.cod = ComandosLoop1.cod }
 
-	//ver
-	DeclaraVar |
-	If |
-	While |
-	DoWhile |
-	For |
-	Atribuicao |
-	Funcao |
-	break; | { ComandosLoop.cod = gen("goto", ComandosLoop.LFim) }
-	continue; | { ComandosLoop.cod = gen("goto", ComandosLoop.LIni) }
-	ComandosLoop1 { ComandosLoop.cod = ComandosLoop1.cod }
+ComandosLoopDesvio ->
+	break; | { if(ComandosLoopDesvio.LFim != null) ComandosLoopDesvio.cod = gen("goto", ComandosLoopDesvio.LFim) }
+	continue; | { if(ComandosLoopDesvio.LIni != null) ComandosLoopDesvio.cod = gen("goto", ComandosLoopDesvio.LIni) }
+	{} { ComandosLoopDesvio.cod = "" }
 
 //passar flag para if poder usar ComandosLoop qnd estiver dentro de loops
 

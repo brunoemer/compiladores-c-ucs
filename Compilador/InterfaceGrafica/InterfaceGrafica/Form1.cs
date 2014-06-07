@@ -41,6 +41,14 @@ namespace InterfaceGrafica
 
 for(i = 0; i < 10; i=i+1){
     j = 1;
+    j = 2;
+    i = i + 1;
+    continue;
+    int a;
+    a += i;
+    break;
+    i = j;
+    j = a;
 }
 
 int end, fim;
