@@ -38,8 +38,8 @@ namespace CompiladorArduino
         public void setArduinoCode(String arduinoCode)
         {
              List<string> list = new List<string>(
-                                       arduinoCode.Split(new string[] { "\r\n" },
-                                       StringSplitOptions.RemoveEmptyEntries));
+                                       arduinoCode.Split(new string[] { "\r\n" }, StringSplitOptions.None)
+                                 );
              this.Lines = list;//Arquivo.Read(@"Arquivos/entrada.txt");
 
             this.LinesOut = new List<String>();
