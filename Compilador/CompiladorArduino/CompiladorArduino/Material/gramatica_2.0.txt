@@ -5,7 +5,7 @@ ListaProg ->
 	ListaComandosGlobal { ListaProg.cod = ListaComandosGlobal.cod }
 	
 ListaComandosGlobal ->
-	Declaracao |
+	Declaracao | { ListaComandosGlobal.cod = Declaracao.cod }
 	If | { ListaComandosGlobal.cod = If.cod }
 	While | { ListaComandosGlobal.cod = While.cod }
 	DoWhile | { ListaComandosGlobal.cod = DoWhile.cod }
@@ -26,31 +26,34 @@ ListaComandos ->
 	{ ListaComandos1.LDesvioIni = ListaComandos.LDesvioIni; ListaComandos1.LDesvioFim = ListaComandos.LDesvioFim } ListaComandos1 { ListaComandos.cod = ListaComandos1.cod }
 
 Declaracao -> 
-	TipoVar id { DecB.tipo = TipoVar.tipo; DecB.idCod = id.cod; } DecB | 
-	void id ( { TableSymbol.add(id.cod, id.tipo, StructureType.Function); currentContext = id.cod } DecC
+	TipoVar id { DecB.tipo = TipoVar.tipo; DecB.idCod = id.cod; } DecB | { Declaracao.cod = gen(id.cod, ":") || DecB.cod }
+	void id ( { TableSymbol.add(id.cod, id.tipo, StructureType.Function); currentContext = id.cod } DecC { Declaracao.cod = gen(id.cod, ":") || DecC.cod }
 DecB -> 
 	; { TableSymbol.add(DecB.idCod, DecB.tipo) } | 
 	, { TableSymbol.add(DecB.idCod, DecB.tipo) } id { ListaVar.tipo = DecB.tipo; TableSymbol.add(id.cod, DecB.tipo) } ListaVar | 
-	( { TableSymbol.add(DecB.idCod, DecB.tipo, StructureType.Function); currentContext = DecB.idCod } DecC
-DecC -> 
-	ListaDecParm) {{ ListaComandos Retorno }} { currentContext = GlobalContext }
-Retorno -> 
-	return ExpAtrib ; | 
-	""
-
-ListaDecParm -> 
-	TipoVar id { TableSymbol.add(id.cod, TipoVar.tipo, currentContext) } ListaDecParmB | 
-	""
-ListaDecParmB -> 
-	, TipoVar id { TableSymbol.add(id.cod, TipoVar.tipo, currentContext) } ListaDecParmB1 | 
-	""
-
+	( { TableSymbol.add(DecB.idCod, DecB.tipo, StructureType.Function); currentContext = DecB.idCod } DecC { DecB.cod = DecC.cod }
 ListaVar -> 
 	, id { ListaVar1.tipo = TipoVar.tipo; TableSymbol.add(id.cod, ListaVar.tipo, currentContext) } ListaVar1 |
 	""
-
 DeclaraVar ->
 	TipoVar id { ListaVar.tipo = TipoVar.tipo; TableSymbol.add(id.cod, ListaVar.tipo, currentContext) } ListaVar;
+
+DecC -> 
+	{ ListaDecParm.NumParam = 1 } ListaDecParm) {{ ListaComandos { Retorno.NumParam = ListaDecParm.NumParam } Retorno }} { currentContext = GlobalContext; 
+		DecC.cod = ListaDecParm.cod || ListaComandos.cod?? || Retorno.cod }
+Retorno -> 
+	return ExpAtrib ; | { Retorno.cod = ExpAtrib.cod || gen("return", ExpAtrib.place??, ", ", Retorno.NumParam ) }
+	"" { Retorno.cod = "" }
+ListaDecParm -> 
+	TipoVar id { TableSymbol.add(id.cod, TipoVar.tipo, currentContext); ListaDecParmB.NumParam = ListaDecParm.NumParam } ListaDecParmB | 
+		{ ListaDecParm.place = criatemp(); ListaDecParm.cod = gen(ListaDecParm.place, " = param[ListaDecParm.NumParam]") || ListaDecParmB.cod;
+		ListaDecParm.NumParam = ListaDecParmB.NumParam }
+	"" { ListaDecParm.cod = "" }
+ListaDecParmB -> 
+	, TipoVar id { TableSymbol.add(id.cod, TipoVar.tipo, currentContext); ListaDecParmB1.NumParam = ListaDecParmB.NumParam } ListaDecParmB1 | { ListaDecParmB.place = criatemp(); 
+		ListaDecParmB.cod = gen(ListaDecParmB.place, " = param[ListaDecParmB.NumParam]") || ListaDecParmB1.cod;
+		ListaDecParmB.NumParam = ListaDecParmB.NumParam + 1 }
+	"" { ListaDecParmB.cod = "" }
 
 TipoVar ->
 	int | { TipoVar.tipo = "int" }
@@ -170,13 +173,13 @@ CG -> CH1 <= CH2  { CG.place = criatemp(); CG.cod = CH1.cod || CH2.cod || gen(<=
 CG -> { CH.true = CG.true; CH.false = CG.false } H { CG.cod = CH.cod; CG.place = CH.place }
 
 CH -> { CJ.true = CH.true; CJ.false = CH.false } CJ { CX.hc = CJ.cod; CX.hp = CJ.place } CX { CH.cod = CX.sc; CH.place = CX.sp;
-		if(CH.true != null && CJ.place != CX.sp???ou CX.sc != ""??) CH.cod += gen("if", CH.place, "!= 0 goto", CH.true) || gen("goto", CH.false); }
+		if(CH.true != null && CX.hp != CX.sp) CH.cod += gen("if", CH.place, "!= 0 goto", CH.true) || gen("goto", CH.false); }
 CX -> + CJ { CX1.hp = criatemp(); CX1.hc = CX.hc || CJ.cod || gen(+, CX1.hp, CX.hp, CJ.place); } CX1 { CX.sp = CX1.sp; CX.sc = CX1.sc }
 CX -> - CJ { CX1.hp = criatemp(); CX1.hc = CX.hc || CJ.cod || gen(-, CX1.hp, CX.hp, CJ.place); } CX1 { CX.sp = CX1.sp; CX.sc = CX1.sc }
 CX -> Ɛ { CX.sp = CX.hp; CX.sc = CX.hc }
 
 CJ -> { CK.true = CJ.true; CK.false = CJ.false } CK { CY.hc = CK.cod; CY.hp = CK.place } CY { CJ.cod = CY.sc; CJ.place = CY.sp;
-		if(CJ.true != null && CK.place != CY.sp???) CJ.cod += gen("if", CJ.place, "!= 0 goto", CJ.true) || gen("goto", CJ.false); }
+		if(CJ.true != null && CY.hp != CY.sp) CJ.cod += gen("if", CJ.place, "!= 0 goto", CJ.true) || gen("goto", CJ.false); }
 CY -> * CK { CY1.hp = criatemp(); CY1.hc = CY.hc || CK.cod || gen(*, CY1.hp, CY.hp, CK.place) } CY1 { CY.sp = CY1.sp; CY.sc = CY1.sc }
 CY -> / CK { CY1.hp = criatemp(); CY1.hc = CY.hc || CK.cod || gen(/, CY1.hp, CY.hp, CK.place) } CY1 { CY.sp = CY1.sp; CY.sc = CY1.sc }
 CY -> % CK { CY1.hp = criatemp(); CY1.hc = CY.hc || CK.cod || gen(%, CY1.hp, CY.hp, CK.place) } CY1 { CY.sp = CY1.sp; CY.sc = CY1.sc }
@@ -228,21 +231,15 @@ ComandosLoopDesvio ->
 	{} { ComandosLoopDesvio.cod = "" }
 
 Funcao ->
-	id ( { TableSymbol.ExistsFunction(id.cod) } ListaParam );
+	id ( { TableSymbol.ExistsFunction(id.cod) } ListaParam ); { Funcao.cod = ListaParam.cod || gen("call", id.cod) }
 	id.id ( ListaParam  ); // REMOVER?
 ListaParam -> 
-	ExpAtrib ListaParamRec | 
-	""
+	ExpAtrib ListaParamRec | { ListaParam.cod = ExpAtrib.cod || gen("Param", ExpAtrib.place) || ListaParamRec.cod }
+	"" { ListaParam.cod = "" }
 ListaParamRec -> 
-	, ExpAtrib ListaParamRec | 
-	""
+	, ExpAtrib ListaParamRec1 | { ListaParamRec.cod = ExpAtrib.cod || gen("Param", ExpAtrib.place) || ListaParamRec1.cod }
+	"" { ListaParamRec.cod = "" }
 	
 
 // Duvidas
--Separar blocos de comandos dos loops, if e funcao {}? nao precisa
--Como fazer verificacao de tipo na atribuicao? float pode ser atribuido para int
--Adicionar atribuicao com operadores reduzidos(+= *= ...)? fazer
--Como fica exp de id = 1 || 2 ? tratar como int
--boolean em c nao existe, como tratar?
--como fica operadores ! ?
--goto no && e ||
+-Verificar se funcao retorna valor, e se tipo retornado eh valido
