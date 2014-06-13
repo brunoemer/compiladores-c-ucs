@@ -11,7 +11,7 @@ ListaComandosGlobal ->
 	DoWhile | { ListaComandosGlobal.cod = DoWhile.cod }
 	For | { ListaComandosGlobal.cod = For.cod }
 	Atribuicao | { ListaComandosGlobal.cod = Atribuicao.cod }
-	Funcao | // fazer
+	Funcao | { ListaComandosGlobal.cod = Funcao.cod }
 	ListaComandosGlobal1 { ListaComandosGlobal.cod = ListaComandosGlobal1.cod }
 
 ListaComandos ->
@@ -22,7 +22,7 @@ ListaComandos ->
 	For | { ListaComandos.cod = For.cod }
 	Atribuicao | { ListaComandos.cod = Atribuicao.cod }
 	{ ComandosLoopDesvio.LDesvioIni = ListaComandos.LDesvioIni; ComandosLoopDesvio.LDesvioFim = ListaComandos.LDesvioFim } ComandosLoopDesvio | { ListaComandos.cod = ComandosLoopDesvio.cod }
-	Funcao | // fazer
+	Funcao | { ListaComandos.cod = Funcao.cod }
 	{ ListaComandos1.LDesvioIni = ListaComandos.LDesvioIni; ListaComandos1.LDesvioFim = ListaComandos.LDesvioFim } ListaComandos1 { ListaComandos.cod = ListaComandos1.cod }
 
 Declaracao -> 
@@ -39,21 +39,21 @@ DeclaraVar ->
 	TipoVar id { ListaVar.tipo = TipoVar.tipo; TableSymbol.add(id.cod, ListaVar.tipo, currentContext) } ListaVar;
 
 DecC -> 
-	{ ListaDecParm.NumParam = 1 } ListaDecParm) {{ ListaComandos { Retorno.NumParam = ListaDecParm.NumParam } Retorno }} { currentContext = GlobalContext; 
+	ListaDecParm) {{ ListaComandos { Retorno.NumParam = ListaDecParm.NumParam } Retorno }} { currentContext = GlobalContext; 
 		DecC.cod = ListaDecParm.cod || ListaComandos.cod?? || Retorno.cod }
 Retorno -> 
-	return ExpAtrib ; | { Retorno.cod = ExpAtrib.cod || gen("return", ExpAtrib.place??, ", ", Retorno.NumParam ) }
+	return ExpAtrib ; | { Retorno.cod = ExpAtrib.cod || gen("return", ExpAtrib.place??, ", ", Retorno.NumParam) }
 	"" { Retorno.cod = "" }
 ListaDecParm -> 
-	TipoVar id { TableSymbol.add(id.cod, TipoVar.tipo, currentContext); ListaDecParmB.NumParam = ListaDecParm.NumParam } ListaDecParmB | 
-		{ ListaDecParm.place = criatemp(); ListaDecParm.cod = gen(ListaDecParm.place, " = param[ListaDecParm.NumParam]") || ListaDecParmB.cod;
-		ListaDecParm.NumParam = ListaDecParmB.NumParam }
-	"" { ListaDecParm.cod = "" }
+	TipoVar id { TableSymbol.add(id.cod, TipoVar.tipo, currentContext) } ListaDecParmB | 
+		{ ListaDecParm.place = criatemp(); ListaDecParm.cod = gen(ListaDecParm.place, " = param[", ListaDecParmB.NumParam, "]") || ListaDecParmB.cod;
+		ListaDecParm.NumParam = ListaDecParmB.NumParam + 1 }
+	"" { ListaDecParm.cod = ""; ListaDecParmB.NumParam = 0 }
 ListaDecParmB -> 
-	, TipoVar id { TableSymbol.add(id.cod, TipoVar.tipo, currentContext); ListaDecParmB1.NumParam = ListaDecParmB.NumParam } ListaDecParmB1 | { ListaDecParmB.place = criatemp(); 
-		ListaDecParmB.cod = gen(ListaDecParmB.place, " = param[ListaDecParmB.NumParam]") || ListaDecParmB1.cod;
-		ListaDecParmB.NumParam = ListaDecParmB.NumParam + 1 }
-	"" { ListaDecParmB.cod = "" }
+	, TipoVar id { TableSymbol.add(id.cod, TipoVar.tipo, currentContext) } ListaDecParmB1 | { 
+		ListaDecParmB.place = criatemp(); ListaDecParmB.cod = gen(ListaDecParmB.place, " = param[", ListaDecParmB1.NumParam, "]") || ListaDecParmB1.cod;
+		ListaDecParmB.NumParam = ListaDecParmB1.NumParam + 1 }
+	"" { ListaDecParmB.cod = ""; ListaDecParmB.NumParam = 1 }
 
 TipoVar ->
 	int | { TipoVar.tipo = "int" }
@@ -125,7 +125,7 @@ K ->
 	ctelong |  { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "long" }
 	ctefloat | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "float" }
 	ctebool | { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "bool" }
-    Funcao // fazer
+    Funcao { K.cod = Funcao.cod }
 
 	
 If ->
@@ -196,8 +196,7 @@ CK ->
 				if(CK.true != null) CK.cod = gen("if ", CK.place, "!= 0 goto", CK.true) || gen("goto", CK.false); }
 	ctefloat |{ CK.place = criatemp(); CK.cod = gen(=, CK.place, cte.val);
 				if(CK.true != null) CK.cod = gen("if ", CK.place, "!= 0 goto", CK.true) || gen("goto", CK.false); }
-	ctebool | { if(CK.true != null){ if (cte.val == true) CK.cod = gen("goto", CK.true); else CK.cod = gen("goto", CK.false); } }
-	Funcao // fazer
+	ctebool { if(CK.true != null){ if (cte.val == true) CK.cod = gen("goto", CK.true); else CK.cod = gen("goto", CK.false); } }
 
 While ->
 	while { LIni = geralabel(); LLoop = geralabel(); LFim = geralabel(); ExpCond.true = LIni; ExpCond.false = LFim } ( ExpCond ) 
@@ -228,7 +227,7 @@ ComandosLoop ->
 ComandosLoopDesvio ->
 	break; | { if(ComandosLoopDesvio.LFim != null) ComandosLoopDesvio.cod = gen("goto", ComandosLoopDesvio.LFim) }
 	continue; | { if(ComandosLoopDesvio.LIni != null) ComandosLoopDesvio.cod = gen("goto", ComandosLoopDesvio.LIni) }
-	{} { ComandosLoopDesvio.cod = "" }
+	"" { ComandosLoopDesvio.cod = "" }
 
 Funcao ->
 	id ( { TableSymbol.ExistsFunction(id.cod) } ListaParam ); { Funcao.cod = ListaParam.cod || gen("call", id.cod) }
