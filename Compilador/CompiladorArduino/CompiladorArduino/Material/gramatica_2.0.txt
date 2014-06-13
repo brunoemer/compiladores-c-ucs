@@ -26,12 +26,12 @@ ListaComandos ->
 	{ ListaComandos1.LDesvioIni = ListaComandos.LDesvioIni; ListaComandos1.LDesvioFim = ListaComandos.LDesvioFim } ListaComandos1 { ListaComandos.cod = ListaComandos1.cod }
 
 Declaracao -> 
-	TipoVar id { DecB.tipo = TipoVar.tipo; DecB.idCod = id.cod; } DecB | { Declaracao.cod = gen(id.cod, ":") || DecB.cod }
+	TipoVar id { DecB.tipo = TipoVar.tipo; DecB.idCod = id.cod; } DecB | { Declaracao.cod = DecB.cod }
 	void id ( { TableSymbol.add(id.cod, id.tipo, StructureType.Function); currentContext = id.cod } DecC { Declaracao.cod = gen(id.cod, ":") || DecC.cod }
 DecB -> 
 	; { TableSymbol.add(DecB.idCod, DecB.tipo) } | 
 	, { TableSymbol.add(DecB.idCod, DecB.tipo) } id { ListaVar.tipo = DecB.tipo; TableSymbol.add(id.cod, DecB.tipo) } ListaVar | 
-	( { TableSymbol.add(DecB.idCod, DecB.tipo, StructureType.Function); currentContext = DecB.idCod } DecC { DecB.cod = DecC.cod }
+	( { TableSymbol.add(DecB.idCod, DecB.tipo, StructureType.Function); currentContext = DecB.idCod } DecC { DecB.cod = gen(DecB.idCod, ":") || DecC.cod }
 ListaVar -> 
 	, id { ListaVar1.tipo = TipoVar.tipo; TableSymbol.add(id.cod, ListaVar.tipo, currentContext) } ListaVar1 |
 	""
@@ -45,13 +45,13 @@ Retorno ->
 	return ExpAtrib ; | { Retorno.cod = ExpAtrib.cod || gen("return", ExpAtrib.place??, ", ", Retorno.NumParam) }
 	"" { Retorno.cod = "" }
 ListaDecParm -> 
-	TipoVar id { TableSymbol.add(id.cod, TipoVar.tipo, currentContext) } ListaDecParmB | 
-		{ ListaDecParm.place = criatemp(); ListaDecParm.cod = gen(ListaDecParm.place, " = param[", ListaDecParmB.NumParam, "]") || ListaDecParmB.cod;
+	TipoVar id { paramTemp = criatemp(); TableSymbol.add(id.cod, TipoVar.tipo, currentContext, paramTemp) } ListaDecParmB | 
+		{ ListaDecParm.cod = gen(paramTemp, " = param[", ListaDecParmB.NumParam, "]") || ListaDecParmB.cod;
 		ListaDecParm.NumParam = ListaDecParmB.NumParam + 1 }
 	"" { ListaDecParm.cod = ""; ListaDecParmB.NumParam = 0 }
 ListaDecParmB -> 
-	, TipoVar id { TableSymbol.add(id.cod, TipoVar.tipo, currentContext) } ListaDecParmB1 | { 
-		ListaDecParmB.place = criatemp(); ListaDecParmB.cod = gen(ListaDecParmB.place, " = param[", ListaDecParmB1.NumParam, "]") || ListaDecParmB1.cod;
+	, TipoVar id { paramTemp = criatemp(); TableSymbol.add(id.cod, TipoVar.tipo, currentContext, paramTemp) } ListaDecParmB1 | { 
+		ListaDecParmB.cod = gen(paramTemp, " = param[", ListaDecParmB1.NumParam, "]") || ListaDecParmB1.cod;
 		ListaDecParmB.NumParam = ListaDecParmB1.NumParam + 1 }
 	"" { ListaDecParmB.cod = ""; ListaDecParmB.NumParam = 1 }
 
@@ -60,7 +60,17 @@ TipoVar ->
 	long | { TipoVar.tipo = "long" }
 	float | { TipoVar.tipo = "float" }
 	bool { TipoVar.tipo = "bool" }
-
+	
+Funcao ->
+	id ( { TableSymbol.ExistsFunction(id.cod) } ListaParam ); { Funcao.cod = ListaParam.cod || gen("call", id.cod) }
+	id.id ( ListaParam  ); // REMOVER?
+ListaParam -> 
+	ExpAtrib ListaParamRec | { ListaParam.cod = ExpAtrib.cod || gen("Param", ExpAtrib.place) || ListaParamRec.cod }
+	"" { ListaParam.cod = "" }
+ListaParamRec -> 
+	, ExpAtrib ListaParamRec1 | { ListaParamRec.cod = ExpAtrib.cod || gen("Param", ExpAtrib.place) || ListaParamRec1.cod }
+	"" { ListaParamRec.cod = "" }
+	
 Atribuicao -> 
 	id { TableSymbol.ExistsVar(id.cod); AtribOp.id = id.cod } AtribOp { Atribuicao.cod = AtribOp.cod }
 AtribOp ->
@@ -229,16 +239,6 @@ ComandosLoopDesvio ->
 	continue; | { if(ComandosLoopDesvio.LIni != null) ComandosLoopDesvio.cod = gen("goto", ComandosLoopDesvio.LIni) }
 	"" { ComandosLoopDesvio.cod = "" }
 
-Funcao ->
-	id ( { TableSymbol.ExistsFunction(id.cod) } ListaParam ); { Funcao.cod = ListaParam.cod || gen("call", id.cod) }
-	id.id ( ListaParam  ); // REMOVER?
-ListaParam -> 
-	ExpAtrib ListaParamRec | { ListaParam.cod = ExpAtrib.cod || gen("Param", ExpAtrib.place) || ListaParamRec.cod }
-	"" { ListaParam.cod = "" }
-ListaParamRec -> 
-	, ExpAtrib ListaParamRec1 | { ListaParamRec.cod = ExpAtrib.cod || gen("Param", ExpAtrib.place) || ListaParamRec1.cod }
-	"" { ListaParamRec.cod = "" }
-	
 
 // Duvidas
 -Verificar se funcao retorna valor, e se tipo retornado eh valido
