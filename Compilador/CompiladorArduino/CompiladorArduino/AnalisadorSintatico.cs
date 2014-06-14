@@ -552,6 +552,65 @@ namespace CompiladorArduino
 
         #endregion Declaracao
 
+        private void Funcao(String FIdCod)
+        {
+            //if (TokenManager.Instance.TokenCode == LexMap.Consts["ID"])
+            //{
+            //    AnalisadorLexico.Analisar();
+            TableSymbol.Instance.ExistsFunction(FIdCod);
+
+            if (TokenManager.Instance.TokenCode == LexMap.Consts["PONTO"])
+            {
+                AnalisadorLexico.Analisar();
+                if (TokenManager.Instance.TokenCode != LexMap.Consts["ID"])
+                {
+                    throw new AnalisadorException("O token id era esperado, id.id()");
+                }
+
+                AnalisadorLexico.Analisar();
+            }
+
+            if (TokenManager.Instance.TokenCode != LexMap.Consts["ABREPAR"])
+            {
+                throw new AnalisadorException("O token ( era esperado");
+            }
+
+            AnalisadorLexico.Analisar();
+            //se for sem parametro
+            if (TokenManager.Instance.TokenCode != LexMap.Consts["FECHAPAR"])
+            {
+                LineManager.Instance.ResetToLastPos();
+                this.ListaParam();
+            }
+
+            if (TokenManager.Instance.TokenCode != LexMap.Consts["FECHAPAR"])
+            {
+                throw new AnalisadorException("O token ) era esperado");
+            }
+            //}
+        }
+
+        private void ListaParam()
+        {
+            String ExpCod, ExpPlace;
+            int ExpTipo;
+            this.ExpAtrib(out ExpCod, out ExpPlace, out ExpTipo);
+
+            this.ListaParamRec();
+        }
+
+        private void ListaParamRec()
+        {
+            if (TokenManager.Instance.TokenCode == LexMap.Consts["VIRGULA"])
+            {
+                String ExpCod, ExpPlace;
+                int ExpTipo;
+                this.ExpAtrib(out ExpCod, out ExpPlace, out ExpTipo);
+
+                this.ListaParamRec();
+            }
+        }
+
         public void Atribuicao(out String AtribCod)
         {
             AtribCod = "";
@@ -1760,65 +1819,6 @@ namespace CompiladorArduino
         }
 
         #endregion loops
-
-        private void Funcao(String FIdCod)
-        {
-            //if (TokenManager.Instance.TokenCode == LexMap.Consts["ID"])
-            //{
-            //    AnalisadorLexico.Analisar();
-                TableSymbol.Instance.ExistsFunction(FIdCod);  
-
-                if (TokenManager.Instance.TokenCode == LexMap.Consts["PONTO"])
-                {
-                    AnalisadorLexico.Analisar();
-                    if (TokenManager.Instance.TokenCode != LexMap.Consts["ID"])
-                    {
-                        throw new AnalisadorException("O token id era esperado, id.id()");
-                    }
-
-                    AnalisadorLexico.Analisar();
-                }
-
-                if (TokenManager.Instance.TokenCode != LexMap.Consts["ABREPAR"])
-                {
-                    throw new AnalisadorException("O token ( era esperado");
-                }
-
-                AnalisadorLexico.Analisar();
-                //se for sem parametro
-                if (TokenManager.Instance.TokenCode != LexMap.Consts["FECHAPAR"])
-                {
-                    LineManager.Instance.ResetToLastPos();
-                    this.ListaParam();
-                }
-
-                if (TokenManager.Instance.TokenCode != LexMap.Consts["FECHAPAR"])
-                {
-                    throw new AnalisadorException("O token ) era esperado");
-                }
-            //}
-        }
-        
-        private void ListaParam()
-        {
-            String ExpCod, ExpPlace;
-            int ExpTipo;
-            this.ExpAtrib(out ExpCod, out ExpPlace, out ExpTipo);
-            
-            this.ListaParamRec();
-        }
-
-        private void ListaParamRec()
-        {
-            if (TokenManager.Instance.TokenCode == LexMap.Consts["VIRGULA"])
-            {
-                String ExpCod, ExpPlace;
-                int ExpTipo;
-                this.ExpAtrib(out ExpCod, out ExpPlace, out ExpTipo);
-
-                this.ListaParamRec();
-            }
-        }
 
         private int nTemp;
         private String CriaTemp()

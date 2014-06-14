@@ -62,7 +62,6 @@ TipoVar ->
 	float | { TipoVar.tipo = "float" }
 	bool { TipoVar.tipo = "bool" }
 	
-	// fazer
 Funcao ->
 	id ( { TableSymbol.ExistsFunction(id.cod) } ListaParam ); { Funcao.cod = ListaParam.cod || gen("call", id.cod) }
 	id.id ( ListaParam  ); // REMOVER?
