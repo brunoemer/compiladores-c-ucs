@@ -62,6 +62,7 @@ TipoVar ->
 	float | { TipoVar.tipo = "float" }
 	bool { TipoVar.tipo = "bool" }
 	
+	// fazer
 Funcao ->
 	id ( { TableSymbol.ExistsFunction(id.cod) } ListaParam ); { Funcao.cod = ListaParam.cod || gen("call", id.cod) }
 	id.id ( ListaParam  ); // REMOVER?
@@ -73,7 +74,7 @@ ListaParamRec ->
 	"" { ListaParamRec.cod = "" }
 	
 Atribuicao -> 
-	id { TableSymbol.ExistsVar(id.cod); AtribOp.id = TableSymbol.getId(id.cod, currentContext)?? } AtribOp { Atribuicao.cod = AtribOp.cod }
+	id { TableSymbol.ExistsVar(id.cod); AtribOp.id = TableSymbol.getId(id.cod, currentContext) } AtribOp { Atribuicao.cod = AtribOp.cod }
 AtribOp ->
 	= ExpAtrib  | { AtribOp.cod = ExpAtrib.cod || gen(=, AtribOp.id, ExpAtrib.place) }
 	+= ExpAtrib | { AtribOp.place = criatemp(); AtribOp.cod = ExpAtrib.cod || 
@@ -130,7 +131,7 @@ Y -> % K { Y1.hp = criatemp(); T1.hc = Y.hc || K.cod || gen(%, Y1.hp, Y.hp, K.pl
 Y -> Ɛ { Y.sp = Y.hp; Y.sc = Y.hc; Y.st = Y.ht }
 
 K ->
-	id |       { TableSymbol.Exists(id.cod); K.place = TableSymbol.getId(id.cod, currentContext)??; K.cod = ""; K.tipo = TableSymbol.getType(id.cod) }
+	id |       { TableSymbol.Exists(id.cod); K.place = TableSymbol.getId(id.cod, currentContext); K.cod = ""; K.tipo = TableSymbol.getType(id.cod) }
 	(ExpAtrib) |    { K.place = ExpAtrib.place; K.cod = ExpAtrib.cod; K.tipo = ExpAtrib.tipo }
 	cteint |   { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "int" }
 	ctelong |  { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "long" }
@@ -167,7 +168,7 @@ CU -> { Lb = geralabel(); CU1.htrue = Lb; CU1.hfalse = CU.hfalse; CU1.true = CU.
 CU -> Ɛ { CU.sc = CU.hc; CU.sp = CU.hp; CU.sc += gen(CU.Lb, ':') || gen("goto", CU.true) }
 
 CF -> { CG.true = CF.true; CG.false = CF.false } CG { CF.cod = CG.cod; CF.place = CG.place }
-CG -> ! { CG1.false = CG.true; CG1.true = CG.false } CG1 { CG.place = criatemp(); CG.cod = CG1.cod || gen(!, CG.place, CG1.place)??? }
+CG -> ! { CG1.false = CG.true; CG1.true = CG.false } CG1 { CG.place = criatemp(); CG.cod = CG1.cod }
 
 CG -> CH1 > CH2  { CG.place = criatemp(); CG.cod = CH1.cod || CH2.cod || gen(>, CG.place, CH1.place, CH2.place) 
 	|| gen("if", CG.place, "!= 0 goto", CG.true) || gen("goto", CG.false); }
@@ -197,7 +198,7 @@ CY -> % CK { CY1.hp = criatemp(); CY1.hc = CY.hc || CK.cod || gen(%, CY1.hp, CY.
 CY -> Ɛ { CY.sp = CY.hp; CY.sc = CY.hc }
 
 CK ->
-	id |    { TableSymbol.Exists(id.cod); CK.place = TableSymbol.getId(id.cod, currentContext)??; CK.cod = ""; 
+	id |    { TableSymbol.Exists(id.cod); CK.place = TableSymbol.getId(id.cod, currentContext); CK.cod = ""; 
 				if(CK.true != null && TableSymbol.getType(id.cod) == "bool") 
 				CK.cod = gen("if", CK.place, "== true goto", CK.true) || gen("goto", CK.false); }
 	(ExpCond) |   { CK.place = ExpCond.place; CK.cod = ExpCond.cod; ExpCond.true = CK.true; ExpCond.false = CK.false; }
@@ -243,3 +244,4 @@ ComandosLoopDesvio ->
 
 // Duvidas
 -Verificar se funcao retorna valor, e se tipo retornado eh valido
+-verificar numero de parametros

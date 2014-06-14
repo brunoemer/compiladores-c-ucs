@@ -557,6 +557,7 @@ namespace CompiladorArduino
             AtribCod = "";
             String id = TokenManager.Instance.TokenSymbol;
             TableSymbol.Instance.ExistsVar(id);
+            id = TableSymbol.Instance.GetSymbol(id).GetId(); //busca variavel temporaria se existir
 
             String AtribOpCod;
             this.AtribOp(id, out AtribOpCod);
@@ -974,6 +975,7 @@ namespace CompiladorArduino
                         LineManager.Instance.ResetToLastPos();
 
                         TableSymbol.Instance.ExistsVar(tk);
+                        tk = TableSymbol.Instance.GetSymbol(tk).GetId(); //busca variavel temporaria se existir
                         KPlace = tk;
                         KTipo = TableSymbol.Instance.GetType(tk);
                     }
@@ -1144,8 +1146,8 @@ namespace CompiladorArduino
             {
                 String CG1Cod, CG1Place;
                 this.ExpCG(out CG1Cod, out CG1Place, CGFalse, CGTrue);
-                CGPlace = this.CriaTemp();
-                CGCod = CG1Cod + CGPlace + " = !" + CG1Place + Environment.NewLine;
+                CGPlace = CG1Place;
+                CGCod = CG1Cod;
             }
             else
             {
@@ -1348,6 +1350,7 @@ namespace CompiladorArduino
                         LineManager.Instance.ResetToLastPos();
 
                         TableSymbol.Instance.ExistsVar(tk);
+                        tk = TableSymbol.Instance.GetSymbol(tk).GetId(); //busca variavel temporaria se existir
 
                         CKPlace = tk;
                         if (TableSymbol.Instance.GetType(tk) == LexMap.Consts["LOGICO"])

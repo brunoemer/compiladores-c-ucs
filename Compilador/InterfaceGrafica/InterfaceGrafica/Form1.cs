@@ -47,7 +47,7 @@ int main(int a, int b, float d){
 }
 i = j;
 i = j;
-if(i > 0 || j == 5 && i+2){    
+if(i > 0 || !j == 5 && i+2){    
 }
 for(i = 0; i < 10; i=i+1){
     if(true){

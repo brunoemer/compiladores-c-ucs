@@ -50,6 +50,17 @@ namespace CompiladorArduino
             this.sType = _sType;
         }
 
+        public String GetId(){
+            if (this.temp == null)
+            {
+                return this.id;
+            }
+            else
+            {
+                return this.temp;
+            }
+        }
+
         public override String ToString()
         {
             return String.Format("id({0}) | type({1}) | contexto({2}) stype({3})", this.id, this.type, this.context, this.sType);
