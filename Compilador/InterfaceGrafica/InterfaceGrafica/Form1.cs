@@ -39,6 +39,14 @@ namespace InterfaceGrafica
             fctb.ClearUndo();
             fctb.Text = @"int i, j;
 
+int main(int a, int b, float d){
+    float c;
+    a = 1;
+    c = a;
+    return c;
+}
+i = j;
+i = j;
 if(i > 0 || j == 5 && i+2){    
 }
 for(i = 0; i < 10; i=i+1){
@@ -51,15 +59,6 @@ for(i = 0; i < 10; i=i+1){
     }
 
     i = j;
-}
-i = j;
-i = j;
-
-int main(int a){
-    int b;
-    a = 1;
-    b = a;
-    return b;
 }
 
 int end, fim;
@@ -87,7 +86,7 @@ end = fim;
                 textBoxErrors.Text = "Compilado\r\n-----------------------\r\n\r\n";
 
                 String ts = TableSymbol.Instance.ToString();
-                textBoxC3E.Text += Environment.NewLine + "Tabela simbolos:" + Environment.NewLine + ts;
+                textBoxErrors.Text += Environment.NewLine + "Tabela simbolos:" + Environment.NewLine + ts;
 
             }
             catch (AnalisadorException ae)

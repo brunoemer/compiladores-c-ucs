@@ -40,20 +40,21 @@ DeclaraVar ->
 
 DecC -> 
 	ListaDecParm) {{ ListaComandos { Retorno.NumParam = ListaDecParm.NumParam } Retorno }} { currentContext = GlobalContext; 
-		DecC.cod = ListaDecParm.cod || ListaComandos.cod?? || Retorno.cod }
+		DecC.cod = ListaDecParm.cod || ListaComandos.cod || Retorno.cod }
 Retorno -> 
-	return ExpAtrib ; | { Retorno.cod = ExpAtrib.cod || gen("return", ExpAtrib.place??, ", ", Retorno.NumParam) }
-	"" { Retorno.cod = "" }
+	return ExpAtrib; | { Retorno.cod = ExpAtrib.cod || gen("return", ExpAtrib.place, ", ", Retorno.NumParam) }
+	"" { Retorno.cod = "return"?? }
 ListaDecParm -> 
-	TipoVar id { paramTemp = criatemp(); TableSymbol.add(id.cod, TipoVar.tipo, currentContext, paramTemp) } ListaDecParmB | 
-		{ ListaDecParm.cod = gen(paramTemp, " = param[", ListaDecParmB.NumParam, "]") || ListaDecParmB.cod;
-		ListaDecParm.NumParam = ListaDecParmB.NumParam + 1 }
-	"" { ListaDecParm.cod = ""; ListaDecParmB.NumParam = 0 }
+	TipoVar id { paramTemp = criatemp(); TableSymbol.add(id.cod, TipoVar.tipo, currentContext, paramTemp); ListaDecParm.NumParam = 1;
+		ListaDecParm.cod = gen(paramTemp, " = param[", ListaDecParmB.NumParam, "]"); ListaDecParmB.NumParam } ListaDecParmB | 
+		{ ListaDecParm.cod += ListaDecParmB.cod; ListaDecParm.NumParam = ListaDecParmB.NumParamB }
+	"" { ListaDecParm.cod = ""; ListaDecParm.NumParam = 0 }
 ListaDecParmB -> 
-	, TipoVar id { paramTemp = criatemp(); TableSymbol.add(id.cod, TipoVar.tipo, currentContext, paramTemp) } ListaDecParmB1 | { 
-		ListaDecParmB.cod = gen(paramTemp, " = param[", ListaDecParmB1.NumParam, "]") || ListaDecParmB1.cod;
-		ListaDecParmB.NumParam = ListaDecParmB1.NumParam + 1 }
-	"" { ListaDecParmB.cod = ""; ListaDecParmB.NumParam = 1 }
+	, TipoVar id { paramTemp = criatemp(); TableSymbol.add(id.cod, TipoVar.tipo, currentContext, paramTemp); ListaDecParmB.NumParam = ListaDecParmB.NumParam + 1;
+		ListaDecParm.cod = gen(paramTemp, " = param[", ListaDecParmB.NumParam, "]"); ListaDecParmB1.NumParam = ListaDecParmB.NumParam } ListaDecParmB1 | { 
+		ListaDecParmB.cod = ListaDecParmB1.cod || gen(paramTemp, " = param[", ListaDecParmB1.NumParam, "]");
+		ListaDecParmB.NumParamB = ListaDecParmB1.NumParamB }
+	"" { ListaDecParmB.cod = ""; ListaDecParmB.NumParam = ListaDecParmB.NumParamB }
 
 TipoVar ->
 	int | { TipoVar.tipo = "int" }
@@ -72,7 +73,7 @@ ListaParamRec ->
 	"" { ListaParamRec.cod = "" }
 	
 Atribuicao -> 
-	id { TableSymbol.ExistsVar(id.cod); AtribOp.id = id.cod } AtribOp { Atribuicao.cod = AtribOp.cod }
+	id { TableSymbol.ExistsVar(id.cod); AtribOp.id = TableSymbol.getId(id.cod, currentContext)?? } AtribOp { Atribuicao.cod = AtribOp.cod }
 AtribOp ->
 	= ExpAtrib  | { AtribOp.cod = ExpAtrib.cod || gen(=, AtribOp.id, ExpAtrib.place) }
 	+= ExpAtrib | { AtribOp.place = criatemp(); AtribOp.cod = ExpAtrib.cod || 
@@ -129,7 +130,7 @@ Y -> % K { Y1.hp = criatemp(); T1.hc = Y.hc || K.cod || gen(%, Y1.hp, Y.hp, K.pl
 Y -> Ɛ { Y.sp = Y.hp; Y.sc = Y.hc; Y.st = Y.ht }
 
 K ->
-	id |       { K.place = id.cod; K.cod = ""; TableSymbol.Exists(id.cod); K.tipo = TableSymbol.getType(id.cod) }
+	id |       { TableSymbol.Exists(id.cod); K.place = TableSymbol.getId(id.cod, currentContext)??; K.cod = ""; K.tipo = TableSymbol.getType(id.cod) }
 	(ExpAtrib) |    { K.place = ExpAtrib.place; K.cod = ExpAtrib.cod; K.tipo = ExpAtrib.tipo }
 	cteint |   { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "int" }
 	ctelong |  { K.place = criatemp(); K.cod = gen(=, K.place, cte.val); K.tipo = "long" }
@@ -196,7 +197,7 @@ CY -> % CK { CY1.hp = criatemp(); CY1.hc = CY.hc || CK.cod || gen(%, CY1.hp, CY.
 CY -> Ɛ { CY.sp = CY.hp; CY.sc = CY.hc }
 
 CK ->
-	id |    { CK.place = id.cod; CK.cod = ""; TableSymbol.Exists(id.cod);
+	id |    { TableSymbol.Exists(id.cod); CK.place = TableSymbol.getId(id.cod, currentContext)??; CK.cod = ""; 
 				if(CK.true != null && TableSymbol.getType(id.cod) == "bool") 
 				CK.cod = gen("if", CK.place, "== true goto", CK.true) || gen("goto", CK.false); }
 	(ExpCond) |   { CK.place = ExpCond.place; CK.cod = ExpCond.cod; ExpCond.true = CK.true; ExpCond.false = CK.false; }

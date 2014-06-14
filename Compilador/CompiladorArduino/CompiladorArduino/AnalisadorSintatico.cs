@@ -50,7 +50,9 @@ namespace CompiladorArduino
                 TokenManager.Instance.TokenCode == LexMap.Consts["VOID"])
             {
                 LineManager.Instance.ResetToLastPos();
-                this.Declaracao();
+                String DecCod;
+                this.Declaracao(out DecCod);
+                LCGCod += DecCod;
                 recur_flag = true;
             }
             else
@@ -240,7 +242,7 @@ namespace CompiladorArduino
         DecB -> ; | , id ListaVar ; | ( DecC
         DecC -> ListaParm) {ListaComandos}
         */
-        private void Declaracao()
+        private void Declaracao(out String DecCod)
         {
             int gramatica = 0;
             int TVTipo = 0;
@@ -262,7 +264,9 @@ namespace CompiladorArduino
                 }
 
                 String DIdCod = TokenManager.Instance.TokenSymbol;
-                this.DecB(TVTipo, DIdCod);
+                String DecBCod;
+                this.DecB(TVTipo, DIdCod, out DecBCod);
+                DecCod = DecBCod;
             }
             else
             {
@@ -288,12 +292,15 @@ namespace CompiladorArduino
                     throw new AnalisadorException("O token ( era esperado.");
                 }
 
-                this.DecC();
+                String DecCCod;
+                this.DecC(out DecCCod);
+                DecCod = DecCCod;
             }
         }
 
-        private void DecB(int DBTipo, String DBIdCod)
+        private void DecB(int DBTipo, String DBIdCod, out String DecBCod)
         {
+            DecBCod = "";
             AnalisadorLexico.Analisar();
 
             if (TokenManager.Instance.TokenCode == LexMap.Consts["PONTOVIRGULA"])
@@ -328,7 +335,9 @@ namespace CompiladorArduino
 
                 TableSymbol.CurrentContext = DBIdCod;
 
-                this.DecC();
+                String DecCCod;
+                this.DecC(out DecCCod);
+                DecBCod = DBIdCod + ": " + DecCCod;
             }
             else
             {
@@ -336,11 +345,14 @@ namespace CompiladorArduino
             }
         }
 
-        private void DecC()
+        private void DecC(out String DecCCod)
         {
             //AnalisadorLexico.Analisar();
 
-            this.ListaDecParm();
+            String LDPCod;
+            int NumParam;
+            this.ListaDecParm(out LDPCod, out NumParam);
+            DecCCod = LDPCod;
 
             if (TokenManager.Instance.TokenCode != LexMap.Consts["FECHAPAR"])
             {
@@ -355,8 +367,11 @@ namespace CompiladorArduino
 
             String LCCod;
             this.ListaComandos(out LCCod);
+            DecCCod += LCCod;
 
-            this.Retorno();
+            String RetCod;
+            this.Retorno(out RetCod, NumParam);
+            DecCCod += RetCod;
 
             //AnalisadorLexico.Analisar();
             if (TokenManager.Instance.TokenCode != LexMap.Consts["FECHACHAVES"])
@@ -367,14 +382,19 @@ namespace CompiladorArduino
             TableSymbol.CurrentContext = TableSymbol.GlobalContext;
         }
 
-        private void Retorno()
+        private void Retorno(out String RetCod, int NumParam)
         {
+            RetCod = "";
             if (TokenManager.Instance.TokenCode == LexMap.Consts["RETURN"])
             {
                 AnalisadorLexico.Analisar();
                 if (TokenManager.Instance.TokenCode == LexMap.Consts["PONTOVIRGULA"])
                 {
+                    //verificar tipo de retorno
+
                     AnalisadorLexico.Analisar();
+
+                    RetCod += "return" + Environment.NewLine;
                     return;
                 }
                 else
@@ -385,11 +405,17 @@ namespace CompiladorArduino
                     int ExpTipo;
                     this.ExpAtrib(out ExpCod, out ExpPlace, out ExpTipo);
 
+                    //verificar tipo de retorno
+                    
+                    RetCod += ExpCod;
+                    RetCod += "return " + ExpPlace + ", " + NumParam + Environment.NewLine;
+
                     if (TokenManager.Instance.TokenCode != LexMap.Consts["PONTOVIRGULA"])
                     {
                         throw new AnalisadorException("O token ; era esperado.");
                     }
                     AnalisadorLexico.Analisar();
+                    
                 }
             }
         }
@@ -398,8 +424,9 @@ namespace CompiladorArduino
             ListaDecParm -> TipoVar id ListaDecParmB | {}
             ListaDecParmB -> , TipoVar id ListaDecParmB | {}
          */
-        private void ListaDecParm()
+        private void ListaDecParm(out String LDPCod, out int NumParam)
         {
+            LDPCod = "";
             int TVTipo = 0;
             try
             {
@@ -407,6 +434,7 @@ namespace CompiladorArduino
             }
             catch (AnalisadorException) {
                 //vazio
+                NumParam = 0;
                 return;
             }
 
@@ -418,13 +446,24 @@ namespace CompiladorArduino
                 throw new AnalisadorException("Um identificador era esperado");
             }
 
-            TableSymbol.Instance.Add(TokenManager.Instance.TokenSymbol, TVTipo, TableSymbol.CurrentContext);
+            String paramTemp = this.CriaTemp();
+            TableSymbol.Instance.Add(TokenManager.Instance.TokenSymbol, TVTipo, TableSymbol.CurrentContext, paramTemp);
 
-            this.ListaDecParmB();
+            NumParam = 1;
+            LDPCod += paramTemp + " = param[" + NumParam + "]" + Environment.NewLine;
+
+            String LDPBCod;
+            int NumParamB;
+            this.ListaDecParmB(out LDPBCod, NumParam, out NumParamB);
+            LDPCod += LDPBCod;
+
+            NumParam = NumParamB;
         }
 
-        private void ListaDecParmB()
+        private void ListaDecParmB(out String LDPBCod, int NumParam, out int NumParamB)
         {
+            LDPBCod = "";
+            NumParamB = NumParam;
             AnalisadorLexico.Analisar();
             if (TokenManager.Instance.TokenCode == LexMap.Consts["VIRGULA"])
             {
@@ -437,9 +476,19 @@ namespace CompiladorArduino
                     throw new AnalisadorException("Um identificador era esperado");
                 }
 
-                TableSymbol.Instance.Add(TokenManager.Instance.TokenSymbol, TVTipo, TableSymbol.CurrentContext);
+                String paramTemp = this.CriaTemp();
+                TableSymbol.Instance.Add(TokenManager.Instance.TokenSymbol, TVTipo, TableSymbol.CurrentContext, paramTemp);
 
-                this.ListaDecParmB();
+                NumParam = NumParam + 1;
+                LDPBCod += paramTemp + " = param[" + NumParam + "]" + Environment.NewLine;
+
+                String LDPB1Cod;
+                int NumParam1B;
+                this.ListaDecParmB(out LDPB1Cod, NumParam, out NumParam1B);
+                
+                LDPBCod += LDPB1Cod;
+
+                NumParamB = NumParam1B;
             }
         }
 

@@ -85,6 +85,8 @@
             this.textBoxErrors.Location = new System.Drawing.Point(0, 0);
             this.textBoxErrors.Multiline = true;
             this.textBoxErrors.Name = "textBoxErrors";
+            this.textBoxErrors.ReadOnly = true;
+            this.textBoxErrors.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBoxErrors.Size = new System.Drawing.Size(381, 309);
             this.textBoxErrors.TabIndex = 1;
             // 
@@ -104,6 +106,8 @@
             this.textBoxC3E.Location = new System.Drawing.Point(0, 0);
             this.textBoxC3E.Multiline = true;
             this.textBoxC3E.Name = "textBoxC3E";
+            this.textBoxC3E.ReadOnly = true;
+            this.textBoxC3E.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBoxC3E.Size = new System.Drawing.Size(550, 662);
             this.textBoxC3E.TabIndex = 0;
             // 

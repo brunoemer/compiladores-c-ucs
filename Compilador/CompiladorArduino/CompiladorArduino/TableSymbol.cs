@@ -47,6 +47,11 @@ namespace CompiladorArduino
             this.Add(new Symbol(id, type, context));
         }
 
+        public void Add(String id, int type, String context, String temp)
+        {
+            this.Add(new Symbol(id, type, context, temp));
+        }
+
         public void Add(String id, int type, StructureType stype)
         {
             this.Add(new Symbol(id, type, stype));

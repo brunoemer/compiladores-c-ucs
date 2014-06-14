@@ -18,6 +18,7 @@ namespace CompiladorArduino
         public int type; // int, float... 
         public String context; // dentro de onde o id esta
         public StructureType sType; // variavel ou funcao
+        public String temp; // variavel temporaria
 
         public Symbol(String _id, int _type)
         {
@@ -31,6 +32,14 @@ namespace CompiladorArduino
             this.id = _id;
             this.type = _type;
             this.context = _context;
+        }
+
+        public Symbol(String _id, int _type, String _context, String _temp)
+        {
+            this.id = _id;
+            this.type = _type;
+            this.context = _context;
+            this.temp = _temp;
         }
 
         public Symbol(String _id, int _type, StructureType _sType)
