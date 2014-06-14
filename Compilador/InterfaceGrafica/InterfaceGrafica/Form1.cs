@@ -38,6 +38,12 @@ namespace InterfaceGrafica
             fctb.IsChanged = false;
             fctb.ClearUndo();
             fctb.Text = @"int i, j;
+float calc(float a){
+    int n;
+    n = a;
+    return n + 1;
+}
+calc(1.2);
 
 int main(int a, int b, float d){
     float c;

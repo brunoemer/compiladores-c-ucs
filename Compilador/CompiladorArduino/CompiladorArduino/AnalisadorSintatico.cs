@@ -110,7 +110,10 @@ namespace CompiladorArduino
                 if (TokenManager.Instance.TokenCode == LexMap.Consts["ABREPAR"] || TokenManager.Instance.TokenCode == LexMap.Consts["PONTO"])
                 {
                     //LineManager.Instance.ResetToLastPos(); // nao retrocede por causa da Atribuicao
-                    this.Funcao(LIdCod);
+                    String FuncCod;
+                    this.Funcao(LIdCod, out FuncCod);
+                    LCGCod += FuncCod;
+
                     AnalisadorLexico.Analisar();
                 }
 
@@ -216,7 +219,10 @@ namespace CompiladorArduino
                 if (TokenManager.Instance.TokenCode == LexMap.Consts["ABREPAR"] || TokenManager.Instance.TokenCode == LexMap.Consts["PONTO"])
                 {
                     //LineManager.Instance.ResetToLastPos(); // nao retrocede por causa da Atribuicao
-                    this.Funcao(LIdCod);
+                    String FuncCod;
+                    this.Funcao(LIdCod, out FuncCod);
+                    LCCod += FuncCod;
+
                     AnalisadorLexico.Analisar();
                 }
                 
@@ -552,23 +558,26 @@ namespace CompiladorArduino
 
         #endregion Declaracao
 
-        private void Funcao(String FIdCod)
+        #region Funcao
+
+        private void Funcao(String FIdCod, out String FuncCod)
         {
+            FuncCod = "";
             //if (TokenManager.Instance.TokenCode == LexMap.Consts["ID"])
             //{
             //    AnalisadorLexico.Analisar();
             TableSymbol.Instance.ExistsFunction(FIdCod);
 
-            if (TokenManager.Instance.TokenCode == LexMap.Consts["PONTO"])
-            {
-                AnalisadorLexico.Analisar();
-                if (TokenManager.Instance.TokenCode != LexMap.Consts["ID"])
-                {
-                    throw new AnalisadorException("O token id era esperado, id.id()");
-                }
+            //if (TokenManager.Instance.TokenCode == LexMap.Consts["PONTO"])
+            //{
+            //    AnalisadorLexico.Analisar();
+            //    if (TokenManager.Instance.TokenCode != LexMap.Consts["ID"])
+            //    {
+            //        throw new AnalisadorException("O token id era esperado, id.id()");
+            //    }
 
-                AnalisadorLexico.Analisar();
-            }
+            //    AnalisadorLexico.Analisar();
+            //}
 
             if (TokenManager.Instance.TokenCode != LexMap.Consts["ABREPAR"])
             {
@@ -580,36 +589,54 @@ namespace CompiladorArduino
             if (TokenManager.Instance.TokenCode != LexMap.Consts["FECHAPAR"])
             {
                 LineManager.Instance.ResetToLastPos();
-                this.ListaParam();
+
+                String LPCod;
+                this.ListaParam(out LPCod);
+                FuncCod += LPCod;
             }
 
             if (TokenManager.Instance.TokenCode != LexMap.Consts["FECHAPAR"])
             {
                 throw new AnalisadorException("O token ) era esperado");
             }
+
+            FuncCod += "call " + FIdCod + Environment.NewLine;
+
             //}
         }
 
-        private void ListaParam()
+        private void ListaParam(out String LPCod)
         {
+            LPCod = "";
             String ExpCod, ExpPlace;
             int ExpTipo;
             this.ExpAtrib(out ExpCod, out ExpPlace, out ExpTipo);
+            LPCod += ExpCod;
+            LPCod += "Param " + ExpPlace + Environment.NewLine;
 
-            this.ListaParamRec();
+            String LPRCod;
+            this.ListaParamRec(out LPRCod);
+            LPCod += LPRCod;
         }
 
-        private void ListaParamRec()
+        private void ListaParamRec(out String LPRCod)
         {
+            LPRCod = "";
             if (TokenManager.Instance.TokenCode == LexMap.Consts["VIRGULA"])
             {
                 String ExpCod, ExpPlace;
                 int ExpTipo;
                 this.ExpAtrib(out ExpCod, out ExpPlace, out ExpTipo);
+                LPRCod += ExpCod;
+                LPRCod += "Param " + ExpPlace + Environment.NewLine;
 
-                this.ListaParamRec();
+                String LPR1Cod;
+                this.ListaParamRec(out LPR1Cod);
+                LPRCod += LPR1Cod;
             }
         }
+
+        #endregion Funcao
 
         public void Atribuicao(out String AtribCod)
         {
@@ -1026,8 +1053,9 @@ namespace CompiladorArduino
                     AnalisadorLexico.Analisar();
                     if (TokenManager.Instance.TokenCode == LexMap.Consts["ABREPAR"] || TokenManager.Instance.TokenCode == LexMap.Consts["PONTO"])
                     {
-                        //falta fazer
-                        this.Funcao(tk);
+                        String FuncCod;
+                        this.Funcao(tk, out FuncCod);
+                        KCod += FuncCod;
                     }
                     else
                     {
@@ -1401,8 +1429,9 @@ namespace CompiladorArduino
                     AnalisadorLexico.Analisar();
                     if (TokenManager.Instance.TokenCode == LexMap.Consts["ABREPAR"] || TokenManager.Instance.TokenCode == LexMap.Consts["PONTO"])
                     {
-                        //falta fazer
-                        this.Funcao(tk);
+                        String FuncCod;
+                        this.Funcao(tk, out FuncCod);
+                        CKCod += FuncCod;
                     }
                     else
                     {

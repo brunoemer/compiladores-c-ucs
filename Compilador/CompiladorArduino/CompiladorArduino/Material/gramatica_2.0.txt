@@ -64,7 +64,6 @@ TipoVar ->
 	
 Funcao ->
 	id ( { TableSymbol.ExistsFunction(id.cod) } ListaParam ); { Funcao.cod = ListaParam.cod || gen("call", id.cod) }
-	id.id ( ListaParam  ); // REMOVER?
 ListaParam -> 
 	ExpAtrib ListaParamRec | { ListaParam.cod = ExpAtrib.cod || gen("Param", ExpAtrib.place) || ListaParamRec.cod }
 	"" { ListaParam.cod = "" }
