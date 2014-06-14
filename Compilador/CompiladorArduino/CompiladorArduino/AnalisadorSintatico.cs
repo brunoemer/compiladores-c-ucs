@@ -396,11 +396,17 @@ namespace CompiladorArduino
                 AnalisadorLexico.Analisar();
                 if (TokenManager.Instance.TokenCode == LexMap.Consts["PONTOVIRGULA"])
                 {
-                    //verificar tipo de retorno
-
-                    AnalisadorLexico.Analisar();
+                    //verifica tipo de retorno
+                    int tRet = TableSymbol.Instance.GetType(TableSymbol.CurrentContext);
+                    if (TableSymbol.CurrentContext != TableSymbol.GlobalContext && tRet != LexMap.Consts["VOID"])
+                    {
+                        throw new AnalisadorException("Retorno com tipo incompatível: " + 
+                            "esperado: " + LexMap.TokenGetNome(tRet) + ", retornado: " + LexMap.TokenGetNome(LexMap.Consts["VOID"]));
+                    }
 
                     RetCod += "return" + Environment.NewLine;
+
+                    AnalisadorLexico.Analisar();
                     return;
                 }
                 else
@@ -411,8 +417,6 @@ namespace CompiladorArduino
                     int ExpTipo;
                     this.ExpAtrib(out ExpCod, out ExpPlace, out ExpTipo);
 
-                    //verificar tipo de retorno
-                    
                     RetCod += ExpCod;
                     RetCod += "return " + ExpPlace + ", " + NumParam + Environment.NewLine;
 
@@ -420,6 +424,23 @@ namespace CompiladorArduino
                     {
                         throw new AnalisadorException("O token ; era esperado.");
                     }
+
+                    //verifica tipo de retorno
+                    int tInt = LexMap.Consts["INTEIRO"];
+                    int tFloat = LexMap.Consts["FLOAT"];
+                    int tLog = LexMap.Consts["LOGICO"];
+                    int tVoid = LexMap.Consts["VOID"];
+                    int tRet = TableSymbol.Instance.GetType(TableSymbol.CurrentContext);
+                    if (TableSymbol.CurrentContext != TableSymbol.GlobalContext &&
+                        (tRet == tLog && ExpTipo != tLog ||
+                        tRet == tInt && ExpTipo == tLog ||
+                        tRet == tFloat && ExpTipo == tLog ||
+                        tRet == tVoid))
+                    {
+                        throw new AnalisadorException("Retorno com tipo incompatível: " +
+                            "esperado: " + LexMap.TokenGetNome(tRet) + ", retornado: " + LexMap.TokenGetNome(ExpTipo));
+                    }
+
                     AnalisadorLexico.Analisar();
                     
                 }
@@ -1062,9 +1083,9 @@ namespace CompiladorArduino
                         LineManager.Instance.ResetToLastPos();
 
                         TableSymbol.Instance.ExistsVar(tk);
+                        KTipo = TableSymbol.Instance.GetType(tk);
                         tk = TableSymbol.Instance.GetSymbol(tk).GetId(); //busca variavel temporaria se existir
                         KPlace = tk;
-                        KTipo = TableSymbol.Instance.GetType(tk);
                     }
                 }
                 else if (tkc == LexMap.Consts["CONSTINTEIRO"])
@@ -1438,10 +1459,11 @@ namespace CompiladorArduino
                         LineManager.Instance.ResetToLastPos();
 
                         TableSymbol.Instance.ExistsVar(tk);
+                        int tTk = TableSymbol.Instance.GetType(tk);
                         tk = TableSymbol.Instance.GetSymbol(tk).GetId(); //busca variavel temporaria se existir
 
                         CKPlace = tk;
-                        if (TableSymbol.Instance.GetType(tk) == LexMap.Consts["LOGICO"])
+                        if (tTk == LexMap.Consts["LOGICO"])
                         {
                             CKCod = "if " + CKPlace + " == true goto " + CKTrue + Environment.NewLine
                                 + "goto " + CKFalse + Environment.NewLine;

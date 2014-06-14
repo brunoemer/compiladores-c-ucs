@@ -241,5 +241,6 @@ ComandosLoopDesvio ->
 
 
 // Duvidas
--Verificar se funcao retorna valor, e se tipo retornado eh valido
--verificar numero de parametros
+-verificar tipo e numero de parametros
+-variaveis locais de funcao tem que substituir por temp?
+-retorno de funcao vazio? somente return?

@@ -38,7 +38,7 @@ namespace InterfaceGrafica
             fctb.IsChanged = false;
             fctb.ClearUndo();
             fctb.Text = @"int i, j;
-float calc(float a){
+void calc(float a){
     int n;
     n = a;
     return n + 1;
