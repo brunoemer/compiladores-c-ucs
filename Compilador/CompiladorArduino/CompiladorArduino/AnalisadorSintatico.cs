@@ -218,7 +218,11 @@ namespace CompiladorArduino
                 //funcao
                 if (TokenManager.Instance.TokenCode == LexMap.Consts["ABREPAR"] || TokenManager.Instance.TokenCode == LexMap.Consts["PONTO"])
                 {
-                    //LineManager.Instance.ResetToLastPos(); // nao retrocede por causa da Atribuicao
+                    if (LIdCod == TableSymbol.CurrentContext)
+                    {
+                        throw new AnalisadorException("Não permitido recursão");
+                    }
+                    
                     String FuncCod;
                     this.Funcao(LIdCod, out FuncCod);
                     LCCod += FuncCod;
@@ -288,7 +292,8 @@ namespace CompiladorArduino
                     throw new AnalisadorException("Um identificador era esperado.");
                 }
 
-                TableSymbol.Instance.Add(TokenManager.Instance.TokenSymbol, TVTipo, StructureType.Function);
+                String DIdCod = TokenManager.Instance.TokenSymbol;
+                TableSymbol.Instance.Add(DIdCod, TVTipo, StructureType.Function);
 
                 TableSymbol.CurrentContext = TokenManager.Instance.TokenSymbol;
 
@@ -300,7 +305,7 @@ namespace CompiladorArduino
 
                 String DecCCod;
                 this.DecC(out DecCCod);
-                DecCod = DecCCod;
+                DecCod = DIdCod + ": " + DecCCod;
             }
         }
 
@@ -378,6 +383,17 @@ namespace CompiladorArduino
             String RetCod;
             this.Retorno(out RetCod, NumParam);
             DecCCod += RetCod;
+            //verifica tipo de retorno, se nao tiver return
+            if (RetCod == "")
+            {
+                int tRet = TableSymbol.Instance.GetType(TableSymbol.CurrentContext);
+                if (TableSymbol.CurrentContext != TableSymbol.GlobalContext && tRet != LexMap.Consts["VOID"])
+                {
+                    throw new AnalisadorException("Retorno com tipo incompatível: " +
+                        "esperado: " + LexMap.TokenGetNome(tRet) + ", retornado: " + LexMap.TokenGetNome(LexMap.Consts["VOID"]));
+                }
+                DecCCod += "return " + NumParam + Environment.NewLine;
+            }
 
             //AnalisadorLexico.Analisar();
             if (TokenManager.Instance.TokenCode != LexMap.Consts["FECHACHAVES"])
@@ -404,7 +420,7 @@ namespace CompiladorArduino
                             "esperado: " + LexMap.TokenGetNome(tRet) + ", retornado: " + LexMap.TokenGetNome(LexMap.Consts["VOID"]));
                     }
 
-                    RetCod += "return" + Environment.NewLine;
+                    RetCod += "return " + NumParam + Environment.NewLine;
 
                     AnalisadorLexico.Analisar();
                     return;
