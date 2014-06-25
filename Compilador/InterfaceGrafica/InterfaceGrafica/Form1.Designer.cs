@@ -32,6 +32,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.fctb = new FastColoredTextBoxNS.FastColoredTextBox();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.textTableSymbol = new System.Windows.Forms.TextBox();
             this.textBoxErrors = new System.Windows.Forms.TextBox();
             this.panel2 = new System.Windows.Forms.Panel();
             this.textBoxC3E = new System.Windows.Forms.TextBox();
@@ -63,7 +64,7 @@
             this.fctb.Name = "fctb";
             this.fctb.Paddings = new System.Windows.Forms.Padding(0);
             this.fctb.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
-            this.fctb.Size = new System.Drawing.Size(381, 353);
+            this.fctb.Size = new System.Drawing.Size(567, 419);
             this.fctb.TabIndex = 4;
             this.fctb.TextChanged += new System.EventHandler<FastColoredTextBoxNS.TextChangedEventArgs>(this.fctb_TextChanged);
             this.fctb.SelectionChanged += new System.EventHandler(this.fctb_SelectionChanged);
@@ -72,22 +73,34 @@
             // panel4
             // 
             this.panel4.BackColor = System.Drawing.Color.Blue;
+            this.panel4.Controls.Add(this.textTableSymbol);
             this.panel4.Controls.Add(this.textBoxErrors);
             this.panel4.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel4.Location = new System.Drawing.Point(0, 353);
+            this.panel4.Location = new System.Drawing.Point(0, 419);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(381, 309);
+            this.panel4.Size = new System.Drawing.Size(567, 243);
             this.panel4.TabIndex = 3;
+            // 
+            // textTableSymbol
+            // 
+            this.textTableSymbol.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textTableSymbol.Location = new System.Drawing.Point(223, 0);
+            this.textTableSymbol.Multiline = true;
+            this.textTableSymbol.Name = "textTableSymbol";
+            this.textTableSymbol.ReadOnly = true;
+            this.textTableSymbol.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.textTableSymbol.Size = new System.Drawing.Size(344, 243);
+            this.textTableSymbol.TabIndex = 2;
             // 
             // textBoxErrors
             // 
-            this.textBoxErrors.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textBoxErrors.Dock = System.Windows.Forms.DockStyle.Left;
             this.textBoxErrors.Location = new System.Drawing.Point(0, 0);
             this.textBoxErrors.Multiline = true;
             this.textBoxErrors.Name = "textBoxErrors";
             this.textBoxErrors.ReadOnly = true;
             this.textBoxErrors.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBoxErrors.Size = new System.Drawing.Size(381, 309);
+            this.textBoxErrors.Size = new System.Drawing.Size(223, 243);
             this.textBoxErrors.TabIndex = 1;
             // 
             // panel2
@@ -95,9 +108,9 @@
             this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
             this.panel2.Controls.Add(this.textBoxC3E);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panel2.Location = new System.Drawing.Point(381, 0);
+            this.panel2.Location = new System.Drawing.Point(567, 0);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(550, 662);
+            this.panel2.Size = new System.Drawing.Size(364, 662);
             this.panel2.TabIndex = 1;
             // 
             // textBoxC3E
@@ -108,7 +121,7 @@
             this.textBoxC3E.Name = "textBoxC3E";
             this.textBoxC3E.ReadOnly = true;
             this.textBoxC3E.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBoxC3E.Size = new System.Drawing.Size(550, 662);
+            this.textBoxC3E.Size = new System.Drawing.Size(364, 662);
             this.textBoxC3E.TabIndex = 0;
             // 
             // timer1
@@ -143,6 +156,7 @@
         private System.Windows.Forms.TextBox textBoxC3E;
         private System.Windows.Forms.TextBox textBoxErrors;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.TextBox textTableSymbol;
     }
 }
 

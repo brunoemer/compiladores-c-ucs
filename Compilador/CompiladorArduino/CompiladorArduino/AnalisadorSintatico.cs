@@ -32,7 +32,9 @@ namespace CompiladorArduino
             String LCGCod;
             this.ListaComandosGlobal(out LCGCod);
 
-            ProgCod = "call main" + Environment.NewLine;
+            String mainId = "main";
+            TableSymbol.Instance.ExistsFunction(mainId);
+            ProgCod = "goto " + mainId + Environment.NewLine;
             ProgCod += LCGCod;
         }
 

@@ -98,12 +98,13 @@ end = fim;
                 textBoxErrors.Text = "Compilado\r\n-----------------------\r\n\r\n";
 
                 String ts = TableSymbol.Instance.ToString();
-                textBoxErrors.Text += Environment.NewLine + "Tabela simbolos:" + Environment.NewLine + ts;
+                textTableSymbol.Text = "Tabela simbolos:" + Environment.NewLine + ts;
 
             }
             catch (AnalisadorException ae)
             {
                 textBoxC3E.Text = "";
+                textTableSymbol.Text = "";
                 textBoxErrors.Text = ae.Message + Environment.NewLine;
                 textBoxErrors.Text += String.Format("Posição vetor da string: {0}{1}", ae.Pos, Environment.NewLine);
                 textBoxErrors.Text += String.Format("Posição coluna: {0}{1}", ae.Col, Environment.NewLine);
@@ -124,6 +125,7 @@ end = fim;
             catch (Exception e)
             {
                 textBoxC3E.Text = "";
+                textTableSymbol.Text = "";
                 textBoxErrors.Text = e.Message + Environment.NewLine;
             }
         }
