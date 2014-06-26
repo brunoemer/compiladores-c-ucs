@@ -43,34 +43,37 @@ float calc(float a){
     n = a;
     return n + 1;
 }
-calc(1.2);
 void reset(){
     i = 0;
 }
 int main(int a, int b, float d){
     float c;
     a = 1;
-    c = a;
     reset();
+    c = a;
+    calc(1.2);
     return c;
 }
-i = j;
-i = j;
-if(i > 0){
-    i = 1;    
-}else{
-    i = 2;
-}
-for(i = 0; i < 10; i=i+1){
-    if(true){
-        break;
-    }
-    while(true){
-        j = j + 1;
-        continue;
-    }
-
+int test(){
     i = j;
+    i = j;
+    if(i > 0){
+        i = 1;    
+    }else{
+        i = 2;
+    }
+    for(i = 0; i < 10; i=i+1){
+        if(true){
+            break;
+        }
+        while(true){
+            j = j + 1;
+            continue;
+        }
+
+        i = j;
+    }
+    return 1;
 }
 
 int end, fim;
