@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.fctb = new FastColoredTextBoxNS.FastColoredTextBox();
             this.panel4 = new System.Windows.Forms.Panel();
             this.textTableSymbol = new System.Windows.Forms.TextBox();
             this.textBoxErrors = new System.Windows.Forms.TextBox();
@@ -43,6 +44,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.fctb);
             this.panel1.Controls.Add(this.panel4);
             this.panel1.Controls.Add(this.panel2);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -50,6 +52,23 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(931, 662);
             this.panel1.TabIndex = 0;
+            // 
+            // fctb
+            // 
+            this.fctb.AutoScrollMinSize = new System.Drawing.Size(25, 15);
+            this.fctb.BackBrush = null;
+            this.fctb.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.fctb.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
+            this.fctb.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.fctb.Location = new System.Drawing.Point(0, 0);
+            this.fctb.Name = "fctb";
+            this.fctb.Paddings = new System.Windows.Forms.Padding(0);
+            this.fctb.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
+            this.fctb.Size = new System.Drawing.Size(567, 419);
+            this.fctb.TabIndex = 4;
+            this.fctb.TextChanged += new System.EventHandler<FastColoredTextBoxNS.TextChangedEventArgs>(this.fctb_TextChanged);
+            this.fctb.SelectionChanged += new System.EventHandler(this.fctb_SelectionChanged);
+            this.fctb.SelectionChangedDelayed += new System.EventHandler(this.fctb_SelectionChangedDelayed);
             // 
             // panel4
             // 
