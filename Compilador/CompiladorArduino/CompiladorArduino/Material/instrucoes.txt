@@ -1,8 +1,16 @@
 ﻿Iniciar o programa com arquivo:
 InterfaceGrafica.exe
 
-Bloco superior esquerdo fica o código em c que será analisado e compilado.
-Bloco direito fica o código C3E compilado.
-Bloco inferior esquerdo fica as mensagens da análise sintática.
-Bloco inferior central fica a tabela de simbolos.
+Interface:
+-Bloco superior esquerdo fica o código em c que será analisado e compilado.
+-Bloco direito fica o código C3E compilado.
+-Bloco inferior esquerdo fica as mensagens da análise sintática.
+-Bloco inferior central fica a tabela de simbolos.
+
+Utilização:
+Alterar código no bloco do código c, após 2 segundos de inatividade ele faz a compilação, atualizando os outros blocos.
+
+Arquivos:
+Gramática versão 1: Material/gramatica_1.0.txt
+Gramática versão 2 final: Material/gramatica_2.0.txt
 
