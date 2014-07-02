@@ -62,19 +62,18 @@
     <None Include="Arquivos\codigo.c3e" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Arquivos\entrada.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Arquivos\entrada2.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Arquivos\saida_lex.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Arquivos\entrada.txt" />
+    <Content Include="Arquivos\entrada2.txt" />
+    <Content Include="Arquivos\saida_lex.txt" />
     <Content Include="Arquivos\tablesymbol.txt" />
-    <Content Include="Material\gramatica_2.0.txt" />
+    <Content Include="Material\gramatica_2.0.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Material\gramatica_recursiva.txt" />
     <Content Include="Material\gramatica.txt" />
+    <Content Include="Material\instrucoes.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
